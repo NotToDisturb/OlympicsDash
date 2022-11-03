@@ -5,7 +5,7 @@ DATASET = r".\res\athlete_events_with_pib.csv"
 
 
 def load_data():
-    df = pd.read_csv(DATASET)
+    df = pd.read_csv(DATASET, encoding="latin1")
     df["Gold"] = df["Medal"].apply(lambda row: 1 if row == "Gold" else 0)
     df["Silver"] = df["Medal"].apply(lambda row: 1 if row == "Silver" else 0)
     df["Bronze"] = df["Medal"].apply(lambda row: 1 if row == "Bronze" else 0)

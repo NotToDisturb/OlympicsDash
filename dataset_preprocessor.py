@@ -1,7 +1,6 @@
 import csv
 import awoc
 import pycountry
-#import pycountry_convert
 
 PIB = r".\res\API_NY.GDP.MKTP.CD_DS2_en_csv_v2_4683825.csv"
 ATHLETES = r".\res\athlete_events.csv"
