@@ -1,5 +1,7 @@
-# OlympicDash
+# OlympicsDash
 ## Instalación y uso
 Paquetes requeridos:
-- plotly
-- pandas
+- plotly: `pip install plotly`
+- pandas: `pip install pandas`
+- pycountry: `pip install pycountry`
+- a-world-of-countries: `pip install a-world-of-countries`
