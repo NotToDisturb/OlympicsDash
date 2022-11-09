@@ -26,3 +26,15 @@ def build_medals_figure(df_medals, medal_type):
                          animation_frame="Year",
                          projection="natural earth")
     return fig
+
+def create_data_genres():
+    df = pd.read_csv(DATASET, encoding="latin1")
+    df["Women"] = df["Sex"].apply(lambda row: 1 if row == "F" else 0)
+    df["Men"] = df["Sex"].apply(lambda row: 1 if row == "M" else 0)
+    df_genre = df[["Year", "NOC", "Women", "Men"]].groupby(["Year", "NOC"]).sum().reset_index()
+    df_genre.to_csv("res/genre_data.csv", index=False)
+
+def create_data_medals():
+    df = load_data()
+    df_medal = df[["Year", "NOC", "Gold", "Silver", "Bronze"]].groupby(["Year", "NOC"]).sum().reset_index()
+    df_medal.to_csv("res/medallero_graph.csv", index=False)
