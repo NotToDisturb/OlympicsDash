@@ -1,44 +1,41 @@
-import pandas as pd
-import plotly.express as px
-
 from dash import Dash, html, dcc
 from dash.dependencies import Input, Output, State
 
+from utils import load_data, get_medal_dataframe, build_medals_figure
+
 app = Dash(__name__)
-DATASET = r".\res\athlete_events_with_pib.csv"
+df = load_data()
 
-
-def load_data():
-    df = pd.read_csv(DATASET, encoding="latin1")
-    df["Gold"] = df["Medal"].apply(lambda row: 1 if row == "Gold" else 0)
-    df["Silver"] = df["Medal"].apply(lambda row: 1 if row == "Silver" else 0)
-    df["Bronze"] = df["Medal"].apply(lambda row: 1 if row == "Bronze" else 0)
-    df["Medals"] = df["Gold"] + df["Silver"] + df["Bronze"]
-    return df
-
-
-def build_medal_dataframe(df, medal_str):
-    df = load_data()
-    group_keys = ["Year", "NOC", "Team", "Continent"]
-    df_medal = df[["Year", "NOC", "Team", "Continent", medal_str]].groupby(group_keys).sum().reset_index()
-
-    return df_medal
-
-
-def build_medals_plot(df_medals, size_str):
-    fig = px.scatter_geo(df_medals, locations="NOC", color="Continent",
-                         hover_name="Team", size=size_str,
-                         animation_frame="Year",
-                         projection="natural earth")
-    return fig
+medal_maps = {
+    "gold-medal-button": {
+        "name": "Oro",
+        "type": "Gold",
+        "data": get_medal_dataframe(df, "Gold"),
+        "figure": None
+    },
+    "silver-medal-button": {
+        "name": "Plata",
+        "type": "Silver",
+        "data": get_medal_dataframe(df, "Silver"),
+        "figure": None
+    },
+    "bronze-medal-button": {
+        "name": "Bronce",
+        "type": "Bronze",
+        "data": get_medal_dataframe(df, "Bronze"),
+        "figure": None
+    },
+    "all-medal-button": {
+        "name": "Total",
+        "type": "Medals",
+        "data": get_medal_dataframe(df, "Medals"),
+        "figure": None
+    }
+}
 
 
 def main():
-    df = load_data()
-
-    df_medals = build_medal_dataframe(df, "Medals")
-
-    fig_medals = build_medals_plot(df_medals, "Medals")
+    init_figures()
 
     app.title = "OlympicsDash"
     app.layout = html.Div(children=[
@@ -53,13 +50,18 @@ def main():
             html.Button(id="all-medals-button", n_clicks_timestamp=0, children="Total")
         ]),
 
-        html.H2(id="title-text", children=""),
+        html.H2(id="title-text", children=medal_maps["gold-medal-button"]["name"]),
         dcc.Graph(
             id='medals-graph',
-            figure=fig_medals
+            figure=medal_maps["gold-medal-button"]["figure"]
         ),
         html.Div(id="latest-country-text", children="")
     ])
+
+
+def init_figures():
+    for medal_map in medal_maps.values():
+        medal_map["figure"] = build_medals_figure(medal_map["data"], medal_map["type"])
 
 
 @app.callback(
@@ -101,23 +103,14 @@ def update_graph_click(gold_disabled, silver_disabled, bronze_disabled, all_disa
         "bronze-medal-button": bronze_disabled,
         "all-medal-button": all_disabled
     }
-    medal_str = {
-        "gold-medal-button": "Gold",
-        "silver-medal-button": "Silver",
-        "bronze-medal-button": "Bronze",
-        "all-medal-button": "Medals"
-    }
 
-    disabled_str = ""
+    disabled_map = None
     for button, disabled in disabled_buttons.items():
         if disabled:
-            disabled_str = medal_str[button]
+            disabled_map = medal_maps[button]
             break
 
-    df = load_data()
-    df_processed = build_medal_dataframe(df, disabled_str)
-    fig_processed = build_medals_plot(df_processed, disabled_str)
-    return disabled_str, fig_processed
+    return disabled_map["name"], disabled_map["figure"]
 
 
 @app.callback(
