@@ -1,6 +1,8 @@
 import pandas as pd
 import plotly.express as px
 
+from dash import dcc
+
 
 DATASET = r".\res\athlete_events_with_pib.csv"
 
@@ -20,12 +22,26 @@ def get_medal_dataframe(df, medal_type):
     return df_medal
 
 
-def build_medals_figure(df_medals, medal_type):
-    fig = px.scatter_geo(df_medals, locations="NOC", color="Continent",
+def build_year_slider(df):
+    years = df["Year"].unique()
+    slider = dcc.Slider(
+        id='years-slider', min=int(min(years)), max=int(max(years)), 
+        step=None, value=int(max(years)), included=False,
+        marks=dict(sorted({int(year): str(year) for year in years}.items()))
+    )
+    return slider
+
+
+def build_medals_figures(df_medals, medal_type):
+    years = df_medals["Year"].unique()
+    fig_years = {}
+    for year in years:
+        df_medals_year = df_medals[df_medals["Year"] == year]
+        fig_year = px.scatter_geo(df_medals_year, locations="NOC", color="Continent",
                          hover_name="Team", size=medal_type,
-                         animation_frame="Year",
                          projection="natural earth")
-    return fig
+        fig_years[year] = fig_year
+    return fig_years
 
 def create_data_genres():
     df = pd.read_csv(DATASET, encoding="latin1")

@@ -1,7 +1,7 @@
 from dash import Dash, html, dcc
 from dash.dependencies import Input, Output, State
 
-from utils import load_data, get_medal_dataframe, build_medals_figure
+from utils import load_data, get_medal_dataframe, build_medals_figures, build_year_slider
 
 # external_stylesheets = [
 #     './styles/style.css'
@@ -15,57 +15,60 @@ medal_maps = {
         "name": "Oro",
         "type": "Gold",
         "data": get_medal_dataframe(df, "Gold"),
-        "figure": None
+        "figures": None
     },
     "silver-medal": {
         "name": "Plata",
         "type": "Silver",
         "data": get_medal_dataframe(df, "Silver"),
-        "figure": None
+        "figures": None
     },
     "bronze-medal": {
         "name": "Bronce",
         "type": "Bronze",
         "data": get_medal_dataframe(df, "Bronze"),
-        "figure": None
+        "figures": None
     },
     "all-medals": {
         "name": "Total",
         "type": "Medals",
         "data": get_medal_dataframe(df, "Medals"),
-        "figure": None
+        "figures": None
     }
 }
 def main():
     init_figures()
+    years = df["Year"].unique()
 
     app.title = "OlympicsDash"
     app.layout = html.Div(
         children=[
-        html.H1(children="OlympicsDash"),
+            html.H1(children="OlympicsDash"),
 
-        html.Div(children="The place to look for all things Olympics data."),
+            html.Div(children="The place to look for all things Olympics data."),
 
-        html.Div([
-            html.Button(id="gold-medals-button", n_clicks_timestamp=0, children="Oros"),
-            html.Button(id="silver-medals-button", n_clicks_timestamp=0, children="Platas"),
-            html.Button(id="bronze-medals-button", n_clicks_timestamp=0, children="Bronzes"),
-            html.Button(id="all-medals-button", n_clicks_timestamp=0, children="Total")
-        ]),
+            html.Div([
+                html.Button(id="gold-medals-button", n_clicks_timestamp=0, children="Oros"),
+                html.Button(id="silver-medals-button", n_clicks_timestamp=0, children="Platas"),
+                html.Button(id="bronze-medals-button", n_clicks_timestamp=0, children="Bronzes"),
+                html.Button(id="all-medals-button", n_clicks_timestamp=0, children="Total")
+            ]),
 
-        html.H2(id="title-text", children=medal_maps["gold-medal"]["name"]),
-        dcc.Graph(
-            id='medals-graph',
-            figure=medal_maps["gold-medal"]["figure"]
-        ),
-        html.Div(id="latest-country-text", children="ESP"),
-        html.Div(id="latest-year-text", children="1960")
-    ])
+            html.H2(id="title-text", children=medal_maps["gold-medal"]["name"]),
+            dcc.Graph(
+                id='medals-graph',
+                figure=medal_maps["gold-medal"]["figures"][1960]
+            ),
+            build_year_slider(df),
+            html.Div(id="selected-country-text", children="ESP"),
+            html.Div(id="selected-year-text", children="2016")
+        ]
+    )
 
 
 def init_figures():
     for medal_map in medal_maps.values():
-        medal_map["figure"] = build_medals_figure(medal_map["data"], medal_map["type"])
+        medal_map["figures"] = build_medals_figures(medal_map["data"], medal_map["type"])
 
 
 @app.callback(
@@ -102,48 +105,44 @@ button_to_map = {
 @app.callback(
     Output('title-text', 'children'),
     Output('medals-graph', 'figure'),
+    Input('years-slider', "drag_value"),
     Input('gold-medals-button', 'disabled'),
     Input('silver-medals-button', 'disabled'),
     Input('bronze-medals-button', 'disabled'),
-    Input('all-medals-button', 'disabled'),
+    Input('all-medals-button', 'disabled')
 )
-def update_graph_click(gold_disabled, silver_disabled, bronze_disabled, all_disabled):
+def update_graph(select_year, gold_disabled, silver_disabled, bronze_disabled, all_disabled):
     disabled_buttons = {
         "gold-medal-button": gold_disabled,
         "silver-medal-button": silver_disabled,
         "bronze-medal-button": bronze_disabled,
         "all-medal-button": all_disabled
     }
-
     disabled_map = None
     for button, disabled in disabled_buttons.items():
         if disabled:
             disabled_map = medal_maps[button_to_map[button]]
             break
 
-    return disabled_map["name"], disabled_map["figure"]
+    return disabled_map["name"], disabled_map["figures"][select_year]
 
 
 @app.callback(
-    Output('latest-country-text', 'children'),
+    Output('selected-country-text', 'children'),
     Input('medals-graph', 'clickData'),
-    Input('latest-country-text', 'children')
+    Input('selected-country-text', 'children')
 )
-def print_country(click_data, selected_cc):
-    print(click_data)
-    select_cc = selected_cc if not click_data else click_data["points"][0]["location"]
-    return select_cc
+def print_country(select_country, selected_cc):
+    return selected_cc if not select_country else select_country["points"][0]["location"]
 
 
 @app.callback(
-    Output('latest-year-text', 'children'),
-    Input('medals-graph', 'figure'),
-    Input('latest-year-text', 'children')
+    Output('selected-year-text', 'children'),
+    Input('years-slider', 'drag_value'),
+    Input('selected-year-text', 'children')
 )
-def print_country(map_figure, selected_year):
-    print(map_figure["layout"]["sliders"])
-    select_year = selected_year
-    return select_year
+def print_year(select_year, selected_year):
+    return selected_year if not selected_year else select_year
 
 
 if __name__ == "__main__":
