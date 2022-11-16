@@ -54,3 +54,35 @@ def create_data_medals():
     df = load_data()
     df_medal = df[["Year", "NOC", "Gold", "Silver", "Bronze"]].groupby(["Year", "NOC"]).sum().reset_index()
     df_medal.to_csv("res/medallero_graph.csv", index=False)
+
+def create_data_top5_sports():
+    df = load_data()
+    df_top = df[["Year", "NOC", "Sport", "Medals"]].groupby(["Year", "NOC", "Sport"]).sum().reset_index()
+    years = df_top["Year"].unique()
+    countries = df_top["NOC"].unique()
+    cols = ["Year", "NOC", "Sport 1", "Medals 1", "Sport 2", "Medals 2", "Sport 3", 
+        "Medals 3", "Sport 4", "Medals 4", "Sport 5", "Medals 5"]
+    output = pd.DataFrame([], columns=cols)
+    for year in years:
+        for country in countries:
+            try:
+                aux = df_top.loc[(df_top["Year"]==year) & (df_top["NOC"]==country)].nlargest(5, "Medals")
+            except:
+                continue
+            if aux["Medals"].sum() == 0:
+                continue
+            data = [year, country]
+            for i in range(5):
+                try:
+                    med = aux.iloc[i, 3]
+                    if med != 0:
+                        data.append(aux.iloc[i, 2])
+                        data.append(med)
+                    else:
+                        data.append("")
+                        data.append("")
+                except:
+                    data.append("")
+                    data.append("")
+            output = pd.concat([output, pd.DataFrame([data], columns=cols)], ignore_index=True)
+    output.to_csv("res/top5_sports.csv", index=False)
