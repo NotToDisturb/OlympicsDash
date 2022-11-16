@@ -3,25 +3,30 @@ import plotly.express as px
 
 from dash import dcc
 
-
+# Relative path to dataset
 DATASET = r".\res\athlete_events_with_pib.csv"
 
 
+# Load the dataset
 def load_data():
     df = pd.read_csv(DATASET, encoding="latin1")
-    df["Gold"] = df["Medal"].apply(lambda row: 1 if row == "Gold" else 0)
-    df["Silver"] = df["Medal"].apply(lambda row: 1 if row == "Silver" else 0)
-    df["Bronze"] = df["Medal"].apply(lambda row: 1 if row == "Bronze" else 0)
-    df["Medals"] = df["Gold"] + df["Silver"] + df["Bronze"]
+    # Add a column containing with a binary value for the medals won
+    df["Gold"] = df["Medal"].apply(lambda row: 1 if row == "Gold" else 0)       # Won a gold medal
+    df["Silver"] = df["Medal"].apply(lambda row: 1 if row == "Silver" else 0)   # Won a silver medal
+    df["Bronze"] = df["Medal"].apply(lambda row: 1 if row == "Bronze" else 0)   # Won a bronze medal
+    df["Medals"] = df["Gold"] + df["Silver"] + df["Bronze"]                     # Won any medal
     return df
 
 
+# Get the yearly sum of medals of a type
 def get_medal_dataframe(df, medal_type):
     group_keys = ["Year", "NOC", "Team", "Continent"]
     df_medal = df[["Year", "NOC", "Team", "Continent", medal_type]].groupby(group_keys).sum().reset_index()
     return df_medal
 
 
+# Build a slider object to select which year to display in the dashboard map
+# It sets up the minimum and maximum year, all the acceptable years and the starting year
 def build_year_slider(df):
     years = df["Year"].unique()
     slider = dcc.Slider(
@@ -31,17 +36,25 @@ def build_year_slider(df):
     )
     return slider
 
-
+# Build the dictionary of yearly medals for a medal type
 def build_medals_figures(df_medals, medal_type):
     years = df_medals["Year"].unique()
     fig_years = {}
     for year in years:
+        # Select medals of a given year
         df_medals_year = df_medals[df_medals["Year"] == year]
+        # Create scatter plot using:
+        # - Country code as locator
+        # - Continent as the color
+        # - Country as the hover text
+        # - Medal count as the size
+        # - "natural earth" as the map type
         fig_year = px.scatter_geo(df_medals_year, locations="NOC", color="Continent",
                          hover_name="Team", size=medal_type,
                          projection="natural earth")
         fig_years[year] = fig_year
     return fig_years
+
 
 def create_data_genres():
     df = pd.read_csv(DATASET, encoding="latin1")

@@ -10,6 +10,14 @@ from utils import load_data, get_medal_dataframe, build_medals_figures, build_ye
 
 app = Dash(__name__ )
 df = load_data()
+
+# Dictionary containing medal data for the maps
+# The medal data is loaded on creation but figures are created separately in order to reuse the loaded data
+# For each medal type the fields are:
+# - name: the name to be shown on the dashboard
+# - type: internal name of the data
+# - data: the data from the medal type
+# - figures: yearly representations of the medal data
 medal_maps = {
     "gold-medal": {
         "name": "Oro",
@@ -36,6 +44,12 @@ medal_maps = {
         "figures": None
     }
 }
+# Init medal figures
+def init_figures():
+    for medal_map in medal_maps.values():
+        medal_map["figures"] = build_medals_figures(medal_map["data"], medal_map["type"])
+
+
 def main():
     init_figures()
     years = df["Year"].unique()
@@ -44,33 +58,44 @@ def main():
     app.layout = html.Div(
         children=[
             html.H1(children="OlympicsDash"),
-
             html.Div(children="The place to look for all things Olympics data."),
 
-            html.Div([
-                html.Button(id="gold-medals-button", n_clicks_timestamp=0, children="Oros"),
-                html.Button(id="silver-medals-button", n_clicks_timestamp=0, children="Platas"),
-                html.Button(id="bronze-medals-button", n_clicks_timestamp=0, children="Bronzes"),
-                html.Button(id="all-medals-button", n_clicks_timestamp=0, children="Total")
-            ]),
+            # Selected country and year selected
+            html.Div(id="country_data", children=[
+                html.Div([
+                    html.Div(id="selected-country-text", children="ESP"),
+                    html.Div(id="selected-year-text", children="2016")
+                ]),
+                html.Div([
+                    html.Div(id="graph_piv"),
+                    html.Div(id="graph_genre"),
+                    html.Div(id="graph_top_sports"),
+                    html.Div(id="graph_medals")
+                ])
+            ], style={"float": "right"}),
 
-            html.H2(id="title-text", children=medal_maps["gold-medal"]["name"]),
-            dcc.Graph(
-                id='medals-graph',
-                figure=medal_maps["gold-medal"]["figures"][1960]
-            ),
-            build_year_slider(df),
-            html.Div(id="selected-country-text", children="ESP"),
-            html.Div(id="selected-year-text", children="2016")
+            html.Div([
+                # Buttons to select medal map
+                html.Div([
+                    html.Button(id="gold-medals-button", n_clicks_timestamp=0, children="Oros"),
+                    html.Button(id="silver-medals-button", n_clicks_timestamp=0, children="Platas"),
+                    html.Button(id="bronze-medals-button", n_clicks_timestamp=0, children="Bronzes"),
+                    html.Button(id="all-medals-button", n_clicks_timestamp=0, children="Total")
+                ]),
+
+                # Title, map and slider
+                html.H2(id="title-text", children=medal_maps["gold-medal"]["name"]),
+                dcc.Graph(
+                    id='medals-graph',
+                    figure=medal_maps["gold-medal"]["figures"][1960]
+                ),
+                build_year_slider(df)
+            ])
         ]
     )
 
 
-def init_figures():
-    for medal_map in medal_maps.values():
-        medal_map["figures"] = build_medals_figures(medal_map["data"], medal_map["type"])
-
-
+# When a map selection button is clicked, the clicked button is disabled and all others enabled
 @app.callback(
     Output('gold-medals-button', 'disabled'),
     Output('silver-medals-button', 'disabled'),
@@ -82,26 +107,30 @@ def init_figures():
     Input('all-medals-button', 'n_clicks_timestamp')
 )
 def update_buttons_click(gold_click, silver_click, bronze_click, all_click):
+    # Map input times to button ids
     clicks_buttons = {
         "gold-medal-button": gold_click,
         "silver-medal-button": silver_click,
         "bronze-medal-button": bronze_click,
         "all-medal-button": all_click
     }
+    # Get the key with the highest value (latest click)
     clicked_button = max(clicks_buttons, key=lambda c: clicks_buttons[c])
+    # Build list of button states
     disabled = []
     for button in clicks_buttons.keys():
         disabled.append(button == clicked_button)
     return tuple(disabled)
 
 
+# Dictionary mapping button ids to medal types
 button_to_map = {
     "gold-medal-button": "gold-medal",
     "silver-medal-button": "silver-medal",
     "bronze-medal-button": "bronze-medal",
     "all-medal-button": "all-medals"
 }
-
+# Update shown figure depending on disabled button and selected country
 @app.callback(
     Output('title-text', 'children'),
     Output('medals-graph', 'figure'),
@@ -112,21 +141,24 @@ button_to_map = {
     Input('all-medals-button', 'disabled')
 )
 def update_graph(select_year, gold_disabled, silver_disabled, bronze_disabled, all_disabled):
+    # Map button states to button ids
     disabled_buttons = {
         "gold-medal-button": gold_disabled,
         "silver-medal-button": silver_disabled,
         "bronze-medal-button": bronze_disabled,
         "all-medal-button": all_disabled
     }
+    # Get all selected yearly maps by finding disabled button
     disabled_map = None
     for button, disabled in disabled_buttons.items():
         if disabled:
             disabled_map = medal_maps[button_to_map[button]]
             break
-
+    
+    # Return medal name and selected yearly map
     return disabled_map["name"], disabled_map["figures"][select_year]
 
-
+# Show the selected country
 @app.callback(
     Output('selected-country-text', 'children'),
     Input('medals-graph', 'clickData'),
@@ -135,14 +167,14 @@ def update_graph(select_year, gold_disabled, silver_disabled, bronze_disabled, a
 def print_country(select_country, selected_cc):
     return selected_cc if not select_country else select_country["points"][0]["location"]
 
-
+# Show the selected year
 @app.callback(
     Output('selected-year-text', 'children'),
     Input('years-slider', 'drag_value'),
     Input('selected-year-text', 'children')
 )
 def print_year(select_year, selected_year):
-    return selected_year if not selected_year else select_year
+    return selected_year if not select_year else select_year
 
 
 if __name__ == "__main__":

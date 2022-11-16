@@ -1,42 +1,6 @@
-@font-face {
-    font-family: "Lexend-Black";
-    src: url("./fonts/Lexend/static/Lexend-Black.ttf") format("truetype");
-}
-@font-face {
-    font-family: "Lexend-Bold";
-    src: url("./fonts/Lexend/static/Lexend-Bold.ttf") format("truetype");
-}
-@font-face {
-    font-family: "Lexend-ExtraBold";
-    src: url("./fonts/Lexend/static/Lexend-ExtraBold.ttf") format("truetype");
-}
-@font-face {
-    font-family: "Lexend-ExtraLight";
-    src: url("./fonts/Lexend/static/Lexend-ExtraLight.ttf") format("truetype");
-}
-@font-face {
-    font-family: "Lexend-Light";
-    src: url("./fonts/Lexend/static/Lexend-Light.ttf") format("truetype");
-}
-@font-face {
-    font-family: "Lexend-Medium";
-    src: url("./fonts/Lexend/static/Lexend-Medium.ttf") format("truetype");
-}
-@font-face {
-    font-family: "Lexend-Regular";
-    src: url("./fonts/Lexend/static/Lexend-Regular.ttf") format("truetype");
-}
-@font-face {
-    font-family: "Lexend-SemiBold";
-    src: url("./fonts/Lexend/static/Lexend-SemiBold.ttf") format("truetype");
-}
-@font-face {
-    font-family: "Lexend-Thin";
-    src: url("./fonts/Lexend/static/Lexend-Thin.ttf") format("truetype");
-}
-
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500&display=swap');
 body{
     background-color: #06082B;
     color:white; 
-    font-family: "Lexend-SemiBold";
+    font-family: 'Lexend', sans-serif;
 }
