@@ -1,7 +1,7 @@
 from dash import Dash, html, dcc
 from dash.dependencies import Input, Output, State
 
-from utils import load_data, get_medal_dataframe, build_medals_figures, build_year_slider
+from utils import load_data, get_medal_dataframe, build_medals_figures, build_year_slider, create_genre_graph
 
 # external_stylesheets = [
 #     './styles/style.css'
@@ -61,19 +61,7 @@ def main():
             html.Div(children="The place to look for all things Olympics data."),
 
             # Selected country and year selected
-            html.Div(id="country_data", children=[
-                html.Div([
-                    html.Div(id="selected-country-text", children="ESP"),
-                    html.Div(id="selected-year-text", children="2016")
-                ]),
-                html.Div([
-                    html.Div(id="graph_piv"),
-                    html.Div(id="graph_genre"),
-                    html.Div(id="graph_top_sports"),
-                    html.Div(id="graph_medals")
-                ])
-            ], style={"float": "right"}),
-
+            
             html.Div([
                 # Buttons to select medal map
                 html.Div([
@@ -90,6 +78,24 @@ def main():
                     figure=medal_maps["gold-medal"]["figures"][1960]
                 ),
                 build_year_slider(df)
+            ]),
+            html.Div(id="country_data", children=[
+                html.Div(className="cd_class", children=[
+                    html.Div(id="selected-country-text", children="ESP"),
+                    html.Div(id="selected-year-text", children="2016")
+                ]),
+                html.Div(className="cd_class", children=[
+                    html.Div(id="graph_piv_div"),
+                    html.Div(id="graph_genre_div", children=[
+                        dcc.Graph(
+                            id='graph_genre',
+                            className='grafico',
+                            figure=create_genre_graph(2016, "ESP")
+                        )
+                    ]),
+                    html.Div(id="graph_top_sports_div"),
+                    html.Div(id="graph_medals_div")
+                ])
             ])
         ]
     )
@@ -176,6 +182,13 @@ def print_country(select_country, selected_cc):
 def print_year(select_year, selected_year):
     return selected_year if not select_year else select_year
 
+@app.callback(
+    Output('graph_genre', 'figure'),
+    Input('selected-year-text', 'children'),
+    Input('selected-country-text', 'children')
+)
+def update_genre(sel_year, sel_country):
+    return create_genre_graph(int(sel_year),sel_country)
 
 if __name__ == "__main__":
     main()

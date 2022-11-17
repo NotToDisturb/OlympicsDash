@@ -1,5 +1,6 @@
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 from dash import dcc
 
@@ -62,6 +63,7 @@ def create_data_genres():
     df["Men"] = df["Sex"].apply(lambda row: 1 if row == "M" else 0)
     df_genre = df[["Year", "NOC", "Women", "Men"]].groupby(["Year", "NOC"]).sum().reset_index()
     df_genre.to_csv("res/genre_data.csv", index=False)
+    return df_genre
 
 def create_data_medals():
     df = load_data()
@@ -99,3 +101,20 @@ def create_data_top5_sports():
                     data.append("")
             output = pd.concat([output, pd.DataFrame([data], columns=cols)], ignore_index=True)
     output.to_csv("res/top5_sports.csv", index=False)
+
+# Creates the genre graphs and returns it
+def create_genre_graph(year, noc):
+    df = pd.read_csv("res/genre_data.csv")
+    # Auxiliar information
+    colors = ["#FE90C0","#9ACDDD"]
+    labels = ['Women','Men']
+    values = df.loc[(df["Year"]==year) & (df["NOC"]==noc)].iloc[:,-2:].values[0].tolist()
+    perc = round(max(values)/(max(values)+min(values))*100,1)
+    texto = f"{perc}%<br>{labels[values.index(max(values))]}"
+    title_info = go.pie.Title(text=texto, font={"size":18})
+    # Graph
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.5, title=title_info)])
+    fig.update_traces(hoverinfo='label+percent', textinfo='value', textfont_size=20,
+                  marker=dict(colors=colors, line=dict(color='#FFFFFF', width=2)))
+    fig.update_layout(paper_bgcolor='#DDD9D9', width=400, height=400)
+    return fig

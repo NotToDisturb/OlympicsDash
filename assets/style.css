@@ -4,3 +4,20 @@ body{
     color:white; 
     font-family: 'Lexend', sans-serif;
 }
+#country_data{
+    position: fixed;
+    width: 25%;
+    left: 75%;
+    top: 0%;
+    display: block;
+}
+.cd_class{
+    display: flex;
+    background-color: #06082B;
+    margin: 10px auto;
+    width: 100%;
+    padding: 10px;
+}
+.cd_class div{
+    margin: auto;
+}
