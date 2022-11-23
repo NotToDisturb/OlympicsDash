@@ -3,7 +3,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 from dash import dcc
+from dataset_generators.top_5_sports_dataset import Top5SportsDataset
 
+GRAPH_HEIGHT = 200
+GRAPH_WIDTH = 300
 
 # Get the yearly sum of medals of a type
 def get_medal_dataframe(df, medal_type):
@@ -51,10 +54,34 @@ def create_genre_graph(gender_df, year, noc):
     values = gender_df.loc[(gender_df["Year"]==year) & (gender_df["NOC"]==noc)].iloc[:,-2:].values[0].tolist()
     perc = round(max(values)/(max(values)+min(values))*100,1)
     texto = f"{perc}%<br>{labels[values.index(max(values))]}"
-    title_info = go.pie.Title(text=texto, font={"size":18})
+    title_info = go.pie.Title(text=texto, font={"size":13})
     # Graph
     fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.5, title=title_info)])
-    fig.update_traces(hoverinfo='label+percent', textinfo='value', textfont_size=20,
+    fig.update_traces(hoverinfo='label+percent', textinfo='value', textfont_size=15,
                   marker=dict(colors=colors, line=dict(color='#FFFFFF', width=2)))
-    fig.update_layout(paper_bgcolor='#DDD9D9', width=400, height=400)
+    fig.update_layout(paper_bgcolor='#DDD9D9', width=GRAPH_WIDTH, height=GRAPH_HEIGHT, margin=dict(l=30,r=30,b=5,t=5))
+    return fig
+
+def create_top5_graph(top5_df, year, noc):
+    values = top5_df.loc[(top5_df["Year"]==year) & (top5_df["NOC"]==noc)].iloc[:,2:].values[0].tolist()
+    colors = ["#80A3AE", "#9ACDDD", "#F29F9F", "#B6DB94", "#F9F4A6"]
+    deportes = [i for i in range(5,0,-1)]
+    x = [values[9], values[7], values[5], values[3], values[1]]
+    y = [values[8], values[6], values[4], values[2], values[0]]
+    fig = go.Figure(data=[go.Bar(x=x, y=y, marker=dict(color=colors, line=dict(color='#FFFFFF', width=2)),orientation='h')])
+    fig.update_traces(text=deportes, textposition='outside', hovertemplate="Position %{text}<br>%{x} medals")
+    fig.update_layout(paper_bgcolor='#DDD9D9', plot_bgcolor='rgba(0,0,0,0)', width=GRAPH_WIDTH, height=GRAPH_HEIGHT, 
+        xaxis = dict(side ="top"), margin=dict(l=5,r=10,b=5,t=5, pad=5))
+    return fig
+
+def create_medals_country_graph(med_df, year, noc):
+    # Auxiliar information
+    colors = ["#DFD082","#7D8398","#B98A67"]
+    labels = ['Gold','Silver', 'Bronze']
+    values = med_df.loc[(med_df["Year"]==year) & (med_df["NOC"]==noc)].iloc[:,-3:].values[0].tolist()
+    # Graph
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.5)])
+    fig.update_traces(hoverinfo='label+percent', textinfo='value', textfont_size=15,
+                  marker=dict(colors=colors, line=dict(color='#FFFFFF', width=2)))
+    fig.update_layout(paper_bgcolor='#DDD9D9', width=GRAPH_WIDTH, height=GRAPH_HEIGHT, margin=dict(l=30,r=30,b=5,t=5))
     return fig

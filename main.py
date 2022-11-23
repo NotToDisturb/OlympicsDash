@@ -2,8 +2,10 @@ from dash import Dash, html, dcc
 from dash.dependencies import Input, Output, State
 
 from dataset_generators.medals_dataset import MedalsDataset
+from dataset_generators.medals_country_dataset import MedalsCountryDataset
 from dataset_generators.gender_dataset import GenderDataset
-from utils import get_medal_dataframe, build_medals_figures, build_year_slider, create_genre_graph
+from dataset_generators.top_5_sports_dataset import Top5SportsDataset
+from utils import get_medal_dataframe, build_medals_figures, build_year_slider, create_genre_graph, create_top5_graph, create_medals_country_graph
 
 # external_stylesheets = [
 #     './styles/style.css'
@@ -12,8 +14,11 @@ from utils import get_medal_dataframe, build_medals_figures, build_year_slider, 
 
 app = Dash(__name__ )
 
+MedalsCountryDataset.build_dataset()
+medals_c_df = MedalsCountryDataset.load_data()
 medals_df = MedalsDataset.load_data()
 gender_df = GenderDataset.load_data()
+top5_df = Top5SportsDataset.load_data()
 
 # Dictionary containing medal data for the maps
 # The medal data is loaded on creation but figures are created separately in order to reuse the loaded data
@@ -85,20 +90,38 @@ def main():
             ]),
             html.Div(id="country_data", children=[
                 html.Div(className="cd_class", children=[
-                    html.Div(id="selected-country-text", children="ESP"),
-                    html.Div(id="selected-year-text", children="2016")
+                    html.Div(id="selected-country-text", className='selector', children="ESP"),
+                    html.Div(id="selected-year-text", className='selector', children="2016")
                 ]),
-                html.Div(className="cd_class", children=[
-                    html.Div(id="graph_piv_div"),
-                    html.Div(id="graph_genre_div", children=[
+                html.Div(id="graph_cointainer", className="cd_class", 
+                    children=[
+                    html.Div(id="graph_piv_div", className='grafico_div'),
+                    html.Div(id="graph_genre_div",  className='grafico_div',
+                    children=[
+                        html.H2(children=GenderDataset.get_name()),
                         dcc.Graph(
                             id='graph_genre',
                             className='grafico',
                             figure=create_genre_graph(gender_df, 2016, "ESP")
                         )
                     ]),
-                    html.Div(id="graph_top_sports_div"),
-                    html.Div(id="graph_medals_div")
+                    html.Div(id="graph_top_sports_div", className='grafico_div',
+                    children=[
+                        html.H2(children=Top5SportsDataset.get_name()),
+                        dcc.Graph(
+                            id='graph_top5',
+                            className='grafico',
+                            figure=create_top5_graph(top5_df, 2016, "ESP")
+                        )]),
+                    html.Div(id="graph_medals_country_div", className='grafico_div',
+                    children=[
+                        html.H2(children=MedalsCountryDataset.get_name()),
+                        dcc.Graph(
+                            id='graph_medals_country',
+                            className='grafico',
+                            figure=create_medals_country_graph(medals_c_df, 2016, "ESP")
+                        )
+                    ])
                 ])
             ])
         ]
@@ -186,6 +209,7 @@ def print_country(select_country, selected_cc):
 def print_year(select_year, selected_year):
     return selected_year if not select_year else select_year
 
+# Build the genre graph
 @app.callback(
     Output('graph_genre', 'figure'),
     Input('selected-year-text', 'children'),
@@ -193,6 +217,24 @@ def print_year(select_year, selected_year):
 )
 def update_genre(sel_year, sel_country):
     return create_genre_graph(gender_df, int(sel_year), sel_country)
+
+# Build the top 5 sports graph
+@app.callback(
+    Output('graph_top5', 'figure'),
+    Input('selected-year-text', 'children'),
+    Input('selected-country-text', 'children')
+)
+def update_genre(sel_year, sel_country):
+    return create_top5_graph(top5_df, int(sel_year), sel_country)
+
+# Build the medals per country graph
+@app.callback(
+    Output('graph_medals_country', 'figure'),
+    Input('selected-year-text', 'children'),
+    Input('selected-country-text', 'children')
+)
+def update_genre(sel_year, sel_country):
+    return create_medals_country_graph(medals_c_df, int(sel_year), sel_country)
 
 if __name__ == "__main__":
     main()

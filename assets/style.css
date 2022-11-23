@@ -13,11 +13,31 @@ body{
 }
 .cd_class{
     display: flex;
+    flex-wrap: wrap;
     background-color: #06082B;
     margin: 10px auto;
     width: 100%;
     padding: 10px;
 }
-.cd_class div{
+
+.grafico_div{
+    text-align: center;
+    margin: 5px auto;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+h2 {
+    width: 100%;
+    text-align: center;
+    margin: 5px auto;
+}
+.selector{
+    width: 50%;
+    margin: auto;
+    text-align: center;
+}
+
+.grafico{
     margin: auto;
 }
