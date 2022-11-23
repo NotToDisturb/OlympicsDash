@@ -1,7 +1,9 @@
 from dash import Dash, html, dcc
 from dash.dependencies import Input, Output, State
 
-from utils import load_data, get_medal_dataframe, build_medals_figures, build_year_slider, create_genre_graph
+from dataset_generators.medals_dataset import MedalsDataset
+from dataset_generators.gender_dataset import GenderDataset
+from utils import get_medal_dataframe, build_medals_figures, build_year_slider, create_genre_graph
 
 # external_stylesheets = [
 #     './styles/style.css'
@@ -9,7 +11,9 @@ from utils import load_data, get_medal_dataframe, build_medals_figures, build_ye
 # external_stylesheets=external_stylesheets
 
 app = Dash(__name__ )
-df = load_data()
+
+medals_df = MedalsDataset.load_data()
+gender_df = GenderDataset.load_data()
 
 # Dictionary containing medal data for the maps
 # The medal data is loaded on creation but figures are created separately in order to reuse the loaded data
@@ -17,30 +21,30 @@ df = load_data()
 # - name: the name to be shown on the dashboard
 # - type: internal name of the data
 # - data: the data from the medal type
-# - figures: yearly representations of the medal data
+# - figures: yearly representations of the medal data (set in init_figures())
 medal_maps = {
     "gold-medal": {
         "name": "Oro",
         "type": "Gold",
-        "data": get_medal_dataframe(df, "Gold"),
+        "data": get_medal_dataframe(medals_df, "Gold"),
         "figures": None
     },
     "silver-medal": {
         "name": "Plata",
         "type": "Silver",
-        "data": get_medal_dataframe(df, "Silver"),
+        "data": get_medal_dataframe(medals_df, "Silver"),
         "figures": None
     },
     "bronze-medal": {
         "name": "Bronce",
         "type": "Bronze",
-        "data": get_medal_dataframe(df, "Bronze"),
+        "data": get_medal_dataframe(medals_df, "Bronze"),
         "figures": None
     },
     "all-medals": {
         "name": "Total",
         "type": "Medals",
-        "data": get_medal_dataframe(df, "Medals"),
+        "data": get_medal_dataframe(medals_df, "Medals"),
         "figures": None
     }
 }
@@ -52,7 +56,7 @@ def init_figures():
 
 def main():
     init_figures()
-    years = df["Year"].unique()
+    #years = df["Year"].unique()
 
     app.title = "OlympicsDash"
     app.layout = html.Div(
@@ -77,7 +81,7 @@ def main():
                     id='medals-graph',
                     figure=medal_maps["gold-medal"]["figures"][1960]
                 ),
-                build_year_slider(df)
+                build_year_slider(medals_df)
             ]),
             html.Div(id="country_data", children=[
                 html.Div(className="cd_class", children=[
@@ -90,7 +94,7 @@ def main():
                         dcc.Graph(
                             id='graph_genre',
                             className='grafico',
-                            figure=create_genre_graph(2016, "ESP")
+                            figure=create_genre_graph(gender_df, 2016, "ESP")
                         )
                     ]),
                     html.Div(id="graph_top_sports_div"),
@@ -188,7 +192,7 @@ def print_year(select_year, selected_year):
     Input('selected-country-text', 'children')
 )
 def update_genre(sel_year, sel_country):
-    return create_genre_graph(int(sel_year),sel_country)
+    return create_genre_graph(gender_df, int(sel_year), sel_country)
 
 if __name__ == "__main__":
     main()
