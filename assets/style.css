@@ -5,11 +5,12 @@ body{
     font-family: 'Lexend', sans-serif;
 }
 #country_data{
-    position: fixed;
+    position:fixed;
     width: 25%;
-    left: 75%;
-    top: 0%;
+    left: 74%;
+    top: 0.5%;
     display: block;
+    padding-bottom: 20px;
 }
 .cd_class{
     display: flex;
@@ -46,4 +47,16 @@ h2 {
     margin: 20px auto;
     overflow-y: scroll;
     height: 90vh;
+}
+#general-div{
+    width: 100%;
+    margin: 5px;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+#graph-buttons{
+    width: 70%;
+    margin-left: 15px;
+    margin-top: 25px;
 }

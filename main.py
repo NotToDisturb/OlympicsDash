@@ -70,33 +70,35 @@ def main():
             html.Div(children="The place to look for all things Olympics data."),
 
             # Selected country and year selected
-            
-            html.Div([
-                # Buttons to select medal map
-                html.Div([
-                    html.Button(id="gold-medals-button", n_clicks_timestamp=0, children="Oros"),
-                    html.Button(id="silver-medals-button", n_clicks_timestamp=0, children="Platas"),
-                    html.Button(id="bronze-medals-button", n_clicks_timestamp=0, children="Bronzes"),
-                    html.Button(id="all-medals-button", n_clicks_timestamp=0, children="Total")
-                ]),
+            html.Div(
+                id="general-div",
+                children = [ 
+                html.Div(id="graph-buttons",children = [
+                    # Buttons to select medal map
+                    html.Div([
+                        html.Button(id="gold-medals-button", n_clicks_timestamp=0, children="Oros"),
+                        html.Button(id="silver-medals-button", n_clicks_timestamp=0, children="Platas"),
+                        html.Button(id="bronze-medals-button", n_clicks_timestamp=0, children="Bronzes"),
+                        html.Button(id="all-medals-button", n_clicks_timestamp=0, children="Total")
+                    ]),
 
-                # Title, map and slider
-                html.H2(id="title-text", children=medal_maps["gold-medal"]["name"]),
-                dcc.Graph(
-                    id='medals-graph',
-                    figure=medal_maps["gold-medal"]["figures"][1960]
-                ),
-                build_year_slider(medals_df)
-            ]),
-            html.Div(id="country_data", children=[
-                html.Div(className="cd_class", children=[
-                    html.Div(id="selected-country-text", className='selector', children="ESP"),
-                    html.Div(id="selected-year-text", className='selector', children="2016")
+                    # Title, map and slider
+                    html.H2(id="title-text", children=medal_maps["gold-medal"]["name"]),
+                    dcc.Graph(
+                        id='medals-graph',
+                        figure=medal_maps["gold-medal"]["figures"][1960]
+                    ),
+                    build_year_slider(medals_df)
                 ]),
-                html.Div(id="graph_container", className="cd_class", 
+                html.Div(id="country_data", children=[
+                    html.Div(className="cd_class", children=[
+                        html.Div(id="selected-country-text", className='selector', children="ESP"),
+                        html.Div(id="selected-year-text", className='selector', children="2016")
+                    ]),
+                    html.Div(id="graph_container", className="cd_class", 
                     children=[
-                    html.Div(id="graph_piv_div", className='grafico_div',
-                    children=[
+                        html.Div(id="graph_piv_div", className='grafico_div',
+                        children=[
                         html.H2(children=PIBDataset.get_name()),
                         dcc.Graph(
                             id='graph_pib_country',
@@ -104,31 +106,32 @@ def main():
                             figure=create_pib_graph(pib_df, 2016, "ESP")
                         )
                     ]),
-                    html.Div(id="graph_genre_div",  className='grafico_div',
-                    children=[
-                        html.H2(children=GenderDataset.get_name()),
-                        dcc.Graph(
-                            id='graph_genre',
-                            className='grafico',
-                            figure=create_genre_graph(gender_df, 2016, "ESP")
-                        )
-                    ]),
-                    html.Div(id="graph_top_sports_div", className='grafico_div',
-                    children=[
-                        html.H2(children=Top5SportsDataset.get_name()),
-                        dcc.Graph(
-                            id='graph_top5',
-                            className='grafico',
-                            figure=create_top5_graph(top5_df, 2016, "ESP")
-                        )]),
-                    html.Div(id="graph_medals_country_div", className='grafico_div',
-                    children=[
-                        html.H2(children=MedalsCountryDataset.get_name()),
-                        dcc.Graph(
-                            id='graph_medals_country',
-                            className='grafico',
-                            figure=create_medals_country_graph(medals_c_df, 2016, "ESP")
-                        )
+                        html.Div(id="graph_genre_div",  className='grafico_div',
+                        children=[
+                            html.H2(children=GenderDataset.get_name()),
+                            dcc.Graph(
+                                id='graph_genre',
+                                className='grafico',
+                                figure=create_genre_graph(gender_df, 2016, "ESP")
+                            )
+                        ]),
+                        html.Div(id="graph_top_sports_div", className='grafico_div',
+                        children=[
+                            html.H2(children=Top5SportsDataset.get_name()),
+                            dcc.Graph(
+                                id='graph_top5',
+                                className='grafico',
+                                figure=create_top5_graph(top5_df, 2016, "ESP")
+                            )]),
+                        html.Div(id="graph_medals_country_div", className='grafico_div',
+                        children=[
+                            html.H2(children=MedalsCountryDataset.get_name()),
+                            dcc.Graph(
+                                id='graph_medals_country',
+                                className='grafico',
+                                figure=create_medals_country_graph(medals_c_df, 2016, "ESP")
+                            )
+                        ])
                     ])
                 ])
             ])
@@ -232,7 +235,7 @@ def update_genre(sel_year, sel_country):
     Input('selected-year-text', 'children'),
     Input('selected-country-text', 'children')
 )
-def update_genre(sel_year, sel_country):
+def update_sports(sel_year, sel_country):
     return create_top5_graph(top5_df, int(sel_year), sel_country)
 
 # Build the medals per country graph
@@ -241,7 +244,7 @@ def update_genre(sel_year, sel_country):
     Input('selected-year-text', 'children'),
     Input('selected-country-text', 'children')
 )
-def update_genre(sel_year, sel_country):
+def update_medals(sel_year, sel_country):
     return create_medals_country_graph(medals_c_df, int(sel_year), sel_country)
 
 @app.callback(
