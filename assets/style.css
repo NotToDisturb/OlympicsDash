@@ -44,6 +44,6 @@ h2 {
 
 #graph_container{
     margin: 20px auto;
-    overflow: scroll;
+    overflow-y: scroll;
     height: 90vh;
 }

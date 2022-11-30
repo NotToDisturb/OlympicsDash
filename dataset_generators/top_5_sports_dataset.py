@@ -2,7 +2,7 @@ import pandas as pd
 
 from dataset_generators.medals_dataset import MedalsDataset
 
-TOP_5_SPORTS_DATASET_NAME = "Top 5 Sports Dataset"
+TOP_5_SPORTS_DATASET_NAME = "Top 5 Sports"
 TOP_5_SPORTS_DATASET_PATH = r".\res\top_5_sports_dataset.csv"
 
 class Top5SportsDataset:

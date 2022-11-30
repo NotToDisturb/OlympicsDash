@@ -6,7 +6,7 @@ from dataset_generators.medals_country_dataset import MedalsCountryDataset
 from dataset_generators.gender_dataset import GenderDataset
 from dataset_generators.top_5_sports_dataset import Top5SportsDataset
 from dataset_generators.pib_dataset import PIBDataset
-from utils import get_medal_dataframe, build_medals_figures, build_year_slider, create_genre_graph, create_top5_graph, create_medals_country_graph
+from utils import *
 
 # external_stylesheets = [
 #     './styles/style.css'
@@ -14,7 +14,6 @@ from utils import get_medal_dataframe, build_medals_figures, build_year_slider, 
 # external_stylesheets=external_stylesheets
 
 app = Dash(__name__ )
-MedalsCountryDataset.build_dataset()
 medals_c_df = MedalsCountryDataset.load_data()
 medals_df = MedalsDataset.load_data()
 gender_df = GenderDataset.load_data()
@@ -96,7 +95,15 @@ def main():
                 ]),
                 html.Div(id="graph_container", className="cd_class", 
                     children=[
-                    html.Div(id="graph_piv_div", className='grafico_div'),
+                    html.Div(id="graph_piv_div", className='grafico_div',
+                    children=[
+                        html.H2(children=PIBDataset.get_name()),
+                        dcc.Graph(
+                            id='graph_pib_country',
+                            className='grafico',
+                            figure=create_pib_graph(pib_df, 2016, "ESP")
+                        )
+                    ]),
                     html.Div(id="graph_genre_div",  className='grafico_div',
                     children=[
                         html.H2(children=GenderDataset.get_name()),
@@ -236,6 +243,14 @@ def update_genre(sel_year, sel_country):
 )
 def update_genre(sel_year, sel_country):
     return create_medals_country_graph(medals_c_df, int(sel_year), sel_country)
+
+@app.callback(
+    Output('graph_pib_country', 'figure'),
+    Input('selected-year-text', 'children'),
+    Input('selected-country-text', 'children')
+)
+def update_pib(sel_year, sel_country):
+    return create_pib_graph(pib_df, int(sel_year), sel_country)
 
 if __name__ == "__main__":
     main()
