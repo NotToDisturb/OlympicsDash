@@ -69,7 +69,7 @@ def create_top5_graph(top5_df, year, noc):
     x = [values[9], values[7], values[5], values[3], values[1]]
     y = [values[8], values[6], values[4], values[2], values[0]]
     fig = go.Figure(data=[go.Bar(x=x, y=y, marker=dict(color=colors, line=dict(color='#FFFFFF', width=2)),orientation='h')])
-    fig.update_traces(text=deportes, textposition='outside', hovertemplate="Position %{text}<br>%{x} medals")
+    fig.update_traces(text=x, textposition='outside', hovertemplate="Position %{text}<br>%{x} medals")
     fig.update_layout(paper_bgcolor='#DDD9D9', plot_bgcolor='rgba(0,0,0,0)', width=GRAPH_WIDTH, height=GRAPH_HEIGHT, 
         xaxis = dict(side ="top"), margin=dict(l=5,r=10,b=5,t=5, pad=5))
     return fig
