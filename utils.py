@@ -85,3 +85,19 @@ def create_medals_country_graph(med_df, year, noc):
                   marker=dict(colors=colors, line=dict(color='#FFFFFF', width=2)))
     fig.update_layout(paper_bgcolor='#DDD9D9', width=GRAPH_WIDTH, height=GRAPH_HEIGHT, margin=dict(l=30,r=30,b=5,t=5))
     return fig
+
+def create_pib_graph(pib_df, year, noc):
+    values = pib_df.loc[(pib_df["NOC"]==noc)]
+    years = values["Year"].values
+    medals = values["Medals"].values
+    pibs = values["PIB"].values
+    g1 = go.Scatter(x=years, y=pibs, yaxis="y1")
+    g2 = go.Bar(x=years, y=medals, yaxis="y2")
+    fig = go.Figure(data=[g2, g1], layout=go.Layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='#DDD9D9'))
+    fig.update_layout(yaxis=dict(side="left", overlaying="y", anchor="x"), 
+        yaxis2=dict(side="right", overlaying="y", anchor="x"))
+    #fig.update_layout(paper_bgcolor='#DDD9D9', width=GRAPH_WIDTH, height=GRAPH_HEIGHT, margin=dict(l=30,r=30,b=5,t=5))
+    fig.show()
+
+from dataset_generators.pib_dataset import PIBDataset
+create_pib_graph(PIBDataset.load_data(), 2016, "ESP")

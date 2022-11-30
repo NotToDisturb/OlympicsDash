@@ -5,6 +5,7 @@ from dataset_generators.medals_dataset import MedalsDataset
 from dataset_generators.medals_country_dataset import MedalsCountryDataset
 from dataset_generators.gender_dataset import GenderDataset
 from dataset_generators.top_5_sports_dataset import Top5SportsDataset
+from dataset_generators.pib_dataset import PIBDataset
 from utils import get_medal_dataframe, build_medals_figures, build_year_slider, create_genre_graph, create_top5_graph, create_medals_country_graph
 
 # external_stylesheets = [
@@ -13,12 +14,12 @@ from utils import get_medal_dataframe, build_medals_figures, build_year_slider, 
 # external_stylesheets=external_stylesheets
 
 app = Dash(__name__ )
-
 MedalsCountryDataset.build_dataset()
 medals_c_df = MedalsCountryDataset.load_data()
 medals_df = MedalsDataset.load_data()
 gender_df = GenderDataset.load_data()
 top5_df = Top5SportsDataset.load_data()
+pib_df = PIBDataset.load_data()
 
 # Dictionary containing medal data for the maps
 # The medal data is loaded on creation but figures are created separately in order to reuse the loaded data
