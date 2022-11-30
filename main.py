@@ -93,7 +93,7 @@ def main():
                     html.Div(id="selected-country-text", className='selector', children="ESP"),
                     html.Div(id="selected-year-text", className='selector', children="2016")
                 ]),
-                html.Div(id="graph_cointainer", className="cd_class", 
+                html.Div(id="graph_container", className="cd_class", 
                     children=[
                     html.Div(id="graph_piv_div", className='grafico_div'),
                     html.Div(id="graph_genre_div",  className='grafico_div',

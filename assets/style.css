@@ -41,3 +41,9 @@ h2 {
 .grafico{
     margin: auto;
 }
+
+#graph_container{
+    margin: 20px auto;
+    overflow: scroll;
+    height: 90vh;
+}
