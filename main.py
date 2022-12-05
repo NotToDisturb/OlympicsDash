@@ -53,7 +53,7 @@ medal_maps = {
         "figures": None
     },
     "pib-medals": {
-        "name": "PIB",
+        "name": "PIB/MEDALLAS",
         "type": "PIB/MEDALS",
         "data": get_medal_dataframe(pib_df, "PIB/MEDALS"),
         "figures": None

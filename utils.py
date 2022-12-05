@@ -8,10 +8,15 @@ from dash import dcc
 GRAPH_HEIGHT = 200
 GRAPH_WIDTH = 300
 
+
 # Get the yearly sum of medals of a type
 def get_medal_dataframe(df, medal_type):
-    group_keys = ["Year", "NOC", "Team", "Continent"]
-    df_medal = df[group_keys + [medal_type]].groupby(group_keys).sum().reset_index()
+    if medal_type == "PIB/MEDALS":
+        group_keys = ["Year", "NOC","Continent","PIB"]
+        df_medal = df[group_keys + [medal_type]].groupby(group_keys).sum().reset_index()
+    else:
+        group_keys = ["Year", "NOC", "Team", "Continent"]
+        df_medal = df[group_keys + [medal_type]].groupby(group_keys).sum().reset_index()
     return df_medal
 
 
@@ -39,9 +44,14 @@ def build_medals_figures(medals_df, medal_type):
         # - Country as the hover text
         # - Medal count as the size
         # - "natural earth" as the map type
-        fig_year = px.scatter_geo(df_medals_year, locations="NOC", color="Continent",
-                         hover_name="Team", size=medal_type,
-                         projection="natural earth")
+        if medal_type == "PIB/MEDALS":
+            fig_year = px.scatter_geo(df_medals_year, locations="NOC", color="Continent",
+                            hover_name="NOC", size=medal_type,
+                            projection="natural earth")
+        else:
+            fig_year = px.scatter_geo(df_medals_year, locations="NOC", color="Continent",
+                            hover_name="Team", size=medal_type,
+                            projection="natural earth")
         fig_years[year] = fig_year
     return fig_years
 
