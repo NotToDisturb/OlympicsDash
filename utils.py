@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -10,7 +11,7 @@ GRAPH_WIDTH = 300
 
 # Get the yearly sum of medals of a type
 def get_medal_dataframe(df, medal_type):
-    group_keys = ["Year", "NOC", "Team", "Continent"]
+    group_keys = ["Year", "NOC", "Team", "Continent", "PIB"]
     df_medal = df[group_keys + [medal_type]].groupby(group_keys).sum().reset_index()
     return df_medal
 
@@ -28,21 +29,49 @@ def build_year_slider(df):
 
 # Build the dictionary of yearly medals for a medal type
 def build_medals_figures(medals_df, medal_type):
+    medals_df = medals_df[["Year", "NOC", "Team", medal_type, "PIB"]].groupby(["Year", "NOC", "Team", "PIB"]).sum().reset_index()
     years = medals_df["Year"].unique()
     fig_years = {}
+    colors = ["royalblue","crimson","lightseagreen","orange"]
+    q3,q2,q1 = np.percentile(medals_df['PIB'].unique(), [75, 50, 25])
+
+    limits = [(0,q1),(q1,q2),(q2,q3),(q3,max(medals_df["PIB"]))]
+
+
     for year in years:
-        # Select medals of a given year
+        fig = go.Figure()
         df_medals_year = medals_df[medals_df["Year"] == year]
-        # Create scatter plot using:
-        # - Country code as locator
-        # - Continent as the color
-        # - Country as the hover text
-        # - Medal count as the size
-        # - "natural earth" as the map type
-        fig_year = px.scatter_geo(df_medals_year, locations="NOC", color="Continent",
-                         hover_name="Team", size=medal_type,
-                         projection="natural earth")
-        fig_years[year] = fig_year
+        for i in range(len(limits)):
+            lim = limits[i]
+            df_sub = df_medals_year.loc[(df_medals_year["PIB"]>=lim[0]) & (df_medals_year["PIB"]<=lim[1])]
+            # print(df_sub)
+            fig.add_trace(go.Scattergeo(
+            locations = df_sub['NOC'],
+            #text = df_sub['text'],
+            geo = "geo",
+            marker = dict(
+                size=df_sub[medal_type],
+                color = colors[i],
+                line_color='rgb(40,40,40)',
+                line_width=0.5,
+                sizemode = 'area'
+            ),
+            name = '{0} - {1}'.format(lim[0],lim[1])))
+            fig.update_layout(
+                geo = go.layout.Geo(
+                    bgcolor="#06082B",
+                    landcolor="#DDD9D9"
+                ),
+                paper_bgcolor = "#06082B",
+                legend= dict(
+                    bgcolor = "#DDD9D9",
+                    font=dict(
+                        family="Lexend",
+                        color= "black"
+                    )
+                )
+            )
+        fig_years[year] = fig
     return fig_years
 
 

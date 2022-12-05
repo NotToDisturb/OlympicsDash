@@ -22,5 +22,5 @@ class MedalsDataset:
         df["Silver"] = df["Medal"].apply(lambda row: 1 if row == "Silver" else 0)   # Won a silver medal
         df["Bronze"] = df["Medal"].apply(lambda row: 1 if row == "Bronze" else 0)   # Won a bronze medal
         df["Medals"] = df["Gold"] + df["Silver"] + df["Bronze"]                     # Won any medal
-        medals_df = df[["Year", "NOC", "Team", "Continent", "Sport", "Gold", "Silver", "Bronze", "Medals"]]
+        medals_df = df[["Year", "NOC", "Team", "Continent", "Sport", "Gold", "Silver", "Bronze", "Medals", "PIB"]]
         medals_df.to_csv(MEDALS_DATASET_PATH, index=False)

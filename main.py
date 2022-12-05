@@ -51,14 +51,7 @@ medal_maps = {
         "type": "Medals",
         "data": get_medal_dataframe(medals_df, "Medals"),
         "figures": None
-    },
-    "pib-medals": {
-        "name": "PIB",
-        "type": "PIB/MEDALS",
-        "data": get_medal_dataframe(pib_df, "PIB/MEDALS"),
-        "figures": None
     }
-
 }
 # Init medal figures
 def init_figures():
@@ -86,8 +79,7 @@ def main():
                         html.Button(id="gold-medals-button", n_clicks_timestamp=0, children="Oros"),
                         html.Button(id="silver-medals-button", n_clicks_timestamp=0, children="Platas"),
                         html.Button(id="bronze-medals-button", n_clicks_timestamp=0, children="Bronzes"),
-                        html.Button(id="all-medals-button", n_clicks_timestamp=0, children="Total"),
-                        html.Button(id="pib-medals-button", n_clicks_timestamp=0, children="Pib/Medals")
+                        html.Button(id="all-medals-button", n_clicks_timestamp=0, children="Total")
                     ]),
 
                     # Title, map and slider
@@ -153,21 +145,18 @@ def main():
     Output('silver-medals-button', 'disabled'),
     Output('bronze-medals-button', 'disabled'),
     Output('all-medals-button', 'disabled'),
-    Output('pib-medals-button', 'disabled'),
     Input('gold-medals-button', 'n_clicks_timestamp'),
     Input('silver-medals-button', 'n_clicks_timestamp'),
     Input('bronze-medals-button', 'n_clicks_timestamp'),
-    Input('all-medals-button', 'n_clicks_timestamp'),
-    Input('pib-medals-button', 'n_clicks_timestamp')
+    Input('all-medals-button', 'n_clicks_timestamp')
 )
-def update_buttons_click(gold_click, silver_click, bronze_click, all_click, pib_medals_click):
+def update_buttons_click(gold_click, silver_click, bronze_click, all_click):
     # Map input times to button ids
     clicks_buttons = {
         "gold-medal-button": gold_click,
         "silver-medal-button": silver_click,
         "bronze-medal-button": bronze_click,
-        "all-medal-button": all_click,
-        "pib-medals-button": pib_medals_click
+        "all-medal-button": all_click
     }
     # Get the key with the highest value (latest click)
     clicked_button = max(clicks_buttons, key=lambda c: clicks_buttons[c])
@@ -183,8 +172,7 @@ button_to_map = {
     "gold-medal-button": "gold-medal",
     "silver-medal-button": "silver-medal",
     "bronze-medal-button": "bronze-medal",
-    "all-medal-button": "all-medals",
-    "pib-medals-button": "pib-medals"
+    "all-medal-button": "all-medals"
 }
 # Update shown figure depending on disabled button and selected country
 @app.callback(
@@ -194,17 +182,15 @@ button_to_map = {
     Input('gold-medals-button', 'disabled'),
     Input('silver-medals-button', 'disabled'),
     Input('bronze-medals-button', 'disabled'),
-    Input('all-medals-button', 'disabled'),
-    Input('pib-medals-button', 'disabled')
+    Input('all-medals-button', 'disabled')
 )
-def update_graph(select_year, gold_disabled, silver_disabled, bronze_disabled, all_disabled, pib_medals_disabled):
+def update_graph(select_year, gold_disabled, silver_disabled, bronze_disabled, all_disabled):
     # Map button states to button ids
     disabled_buttons = {
         "gold-medal-button": gold_disabled,
         "silver-medal-button": silver_disabled,
         "bronze-medal-button": bronze_disabled,
-        "all-medal-button": all_disabled,
-        "pib-medals-button": pib_medals_disabled
+        "all-medal-button": all_disabled
     }
     # Get all selected yearly maps by finding disabled button
     disabled_map = None
