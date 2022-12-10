@@ -29,25 +29,25 @@ pib_df = PIBDataset.load_data()
 # - figures: yearly representations of the medal data (set in init_figures())
 medal_maps = {
     "gold-medal": {
-        "name": "Oro",
+        "name": "GOLD",
         "type": "Gold",
         "data": get_medal_dataframe(medals_df, "Gold"),
         "figures": None
     },
     "silver-medal": {
-        "name": "Plata",
+        "name": "SILVER",
         "type": "Silver",
         "data": get_medal_dataframe(medals_df, "Silver"),
         "figures": None
     },
     "bronze-medal": {
-        "name": "Bronce",
+        "name": "BRONZE",
         "type": "Bronze",
         "data": get_medal_dataframe(medals_df, "Bronze"),
         "figures": None
     },
     "all-medals": {
-        "name": "Total",
+        "name": "TOTAL",
         "type": "Medals",
         "data": get_medal_dataframe(medals_df, "Medals"),
         "figures": None
@@ -66,8 +66,8 @@ def main():
     app.title = "OlympicsDash"
     app.layout = html.Div(
         children=[
-            html.H1(children="OlympicsDash"),
-            html.Div(children="The place to look for all things Olympics data."),
+            html.H1( id="title", children="OlympicsDash"),
+            html.Div(id="subtitle", children="The place to look for all things Olympics data."),
 
             # Selected country and year selected
             html.Div(
@@ -75,18 +75,25 @@ def main():
                 children = [ 
                 html.Div(id="graph-buttons",children = [
                     # Buttons to select medal map
-                    html.Div([
-                        html.Button(id="gold-medals-button", n_clicks_timestamp=0, children="Oros"),
-                        html.Button(id="silver-medals-button", n_clicks_timestamp=0, children="Platas"),
-                        html.Button(id="bronze-medals-button", n_clicks_timestamp=0, children="Bronzes"),
-                        html.Button(id="all-medals-button", n_clicks_timestamp=0, children="Total")
+                    html.Div(id="titles-buttons", children = [
+                        html.Div(id= "buttons", children=[
+                            html.Button(id="gold-medals-button", n_clicks_timestamp=0, children="GOLD"),
+                            html.Button(id="silver-medals-button", n_clicks_timestamp=0, children="SILVER"),
+                            html.Button(id="bronze-medals-button", n_clicks_timestamp=0, children="BRONZE"),
+                            html.Button(id="all-medals-button", n_clicks_timestamp=0, children="TOTAL")    
+                        ]),
+                        html.Div(id="title-div", children=[
+                            # Title
+                            html.H2(id="title-text", children=medal_maps["gold-medal"]["name"])
+                        ])
+                        
                     ]),
-
-                    # Title, map and slider
-                    html.H2(id="title-text", children=medal_maps["gold-medal"]["name"]),
+                    
+                    # Map and slider
+                    
                     dcc.Graph(
                         id='medals-graph',
-                        figure=medal_maps["gold-medal"]["figures"][1960]
+                        figure=medal_maps["gold-medal"]["figures"][2016]
                     ),
                     build_year_slider(medals_df)
                 ]),
@@ -99,7 +106,7 @@ def main():
                     children=[
                         html.Div(id="graph_piv_div", className='grafico_div',
                         children=[
-                        html.H2(children=PIBDataset.get_name()),
+                        html.H3(children=PIBDataset.get_name()),
                         dcc.Graph(
                             id='graph_pib_country',
                             className='grafico',
@@ -108,7 +115,7 @@ def main():
                     ]),
                         html.Div(id="graph_genre_div",  className='grafico_div',
                         children=[
-                            html.H2(children=GenderDataset.get_name()),
+                            html.H3(children=GenderDataset.get_name()),
                             dcc.Graph(
                                 id='graph_genre',
                                 className='grafico',
@@ -117,7 +124,7 @@ def main():
                         ]),
                         html.Div(id="graph_top_sports_div", className='grafico_div',
                         children=[
-                            html.H2(children=Top5SportsDataset.get_name()),
+                            html.H3(children=Top5SportsDataset.get_name()),
                             dcc.Graph(
                                 id='graph_top5',
                                 className='grafico',
@@ -125,7 +132,7 @@ def main():
                             )]),
                         html.Div(id="graph_medals_country_div", className='grafico_div',
                         children=[
-                            html.H2(children=MedalsCountryDataset.get_name()),
+                            html.H3(children=MedalsCountryDataset.get_name()),
                             dcc.Graph(
                                 id='graph_medals_country',
                                 className='grafico',
@@ -247,6 +254,7 @@ def update_sports(sel_year, sel_country):
 def update_medals(sel_year, sel_country):
     return create_medals_country_graph(medals_c_df, int(sel_year), sel_country)
 
+# Build the pib graph
 @app.callback(
     Output('graph_pib_country', 'figure'),
     Input('selected-year-text', 'children'),

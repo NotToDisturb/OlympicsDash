@@ -2,7 +2,7 @@ import pandas as pd
 
 from dataset_generators.base_dataset import BaseDataset
 
-MEDALS_DATASET_NAME = "Medals"
+MEDALS_DATASET_NAME = "MEDALS"
 MEDALS_DATASET_PATH = r".\res\medals_dataset.csv"
 
 class MedalsDataset:

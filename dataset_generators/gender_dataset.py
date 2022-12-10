@@ -2,7 +2,7 @@ import pandas as pd
 
 from dataset_generators.base_dataset import BaseDataset
 
-GENRE_DATASET_NAME = "Participation per gender"
+GENRE_DATASET_NAME = "PARTICIPATION PER GENDER"
 GENRE_DATASET_PATH = r".\res\gender_dataset.csv"
 
 class GenderDataset:

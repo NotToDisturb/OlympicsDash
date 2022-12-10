@@ -27,8 +27,37 @@ def build_year_slider(df):
     )
     return slider
 
+def empty_graph(msg):
+    return {
+        "layout": {
+            "xaxis": {
+                "visible": False
+            },
+            "yaxis": {
+                "visible": False
+            },
+            "plot_bgcolor":"'rgba(0,0,0,0)'",
+            "paper_bgcolor":"rgba(221, 217, 217, 0.757)",
+            "width": GRAPH_WIDTH,
+            "height": GRAPH_HEIGHT, 
+            "annotations": [
+                {
+                    "text": msg,
+                    "xref": "paper",
+                    "yref": "paper",
+                    "showarrow": False,
+                    "font": {
+                        "size": 18
+                    },
+                    "bgcolor": "'rgba(0,0,0,0)'"
+                }
+            ]
+        }
+    }
+
 # Build the dictionary of yearly medals for a medal type
 def build_medals_figures(medals_df, medal_type):
+    medals_df["PIB"] = medals_df['PIB'].div(1e9).round(0)
     medals_df = medals_df[["Year", "NOC", "Team", medal_type, "PIB"]].groupby(["Year", "NOC", "Team", "PIB"]).sum().reset_index()
     years = medals_df["Year"].unique()
     fig_years = {}
@@ -50,26 +79,32 @@ def build_medals_figures(medals_df, medal_type):
             #text = df_sub['text'],
             geo = "geo",
             marker = dict(
-                size=df_sub[medal_type],
+                size=df_sub[medal_type]**1.4,
                 color = colors[i],
                 line_color='rgb(40,40,40)',
                 line_width=0.5,
                 sizemode = 'area'
             ),
+            legendgrouptitle = {"text": "PIB in Billion USD", "font": {"color": "#000000", "size": 16}},
             name = '{0} - {1}'.format(lim[0],lim[1])))
             fig.update_layout(
                 geo = go.layout.Geo(
                     bgcolor="#06082B",
-                    landcolor="#DDD9D9"
+                    landcolor="rgba(221, 217, 217, 1)"
                 ),
                 paper_bgcolor = "#06082B",
-                legend= dict(
-                    bgcolor = "#DDD9D9",
+                legend = dict(
+                    bgcolor = "rgba(221, 217, 217, 0.757)",
+                    itemwidth=40,
+                    itemsizing = 'constant',
                     font=dict(
                         family="Lexend",
-                        color= "black"
+                        color= "black",
+                        size=14
                     )
-                )
+                ),
+                height = 1000,
+                margin={"r": 0, "t": 25, "l": 0, "b":25}
             )
         fig_years[year] = fig
     return fig_years
@@ -81,80 +116,96 @@ def create_genre_graph(gender_df, year, noc):
     # Auxiliar information
     colors = ["#FE90C0","#9ACDDD"]
     labels = ['Women','Men']
-    # We obtain the number of participants per gender given a year and a country from the dataframe.
-    values = gender_df.loc[(gender_df["Year"]==year) & (gender_df["NOC"]==noc)].iloc[:,-2:].values[0].tolist()
-    # Percentaje to show it in the title.
-    perc = round(max(values)/(max(values)+min(values))*100,1)
-    # Title information.
-    texto = f"{perc}%<br>{labels[values.index(max(values))]}"
-    title_info = go.pie.Title(text=texto, font={"size":13})
-    # Pie chart
-    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.5, title=title_info)])
-    # Styling additions.
-    fig.update_traces(hoverinfo='label+percent', textinfo='value', textfont_size=15,
-                  marker=dict(colors=colors, line=dict(color='#FFFFFF', width=2)))
-    fig.update_layout(paper_bgcolor='#DDD9D9', width=GRAPH_WIDTH, height=GRAPH_HEIGHT, margin=dict(l=30,r=30,b=5,t=5))
-    return fig
+    try:
+        # We obtain the number of participants per gender given a year and a country from the dataframe.
+        values = gender_df.loc[(gender_df["Year"]==year) & (gender_df["NOC"]==noc)].iloc[:,-2:].values[0].tolist()
+        # Percentaje to show it in the title.
+        perc = round(max(values)/(max(values)+min(values))*100,1)
+        # Title information.
+        texto = f"{perc}%<br>{labels[values.index(max(values))]}"
+        title_info = go.pie.Title(text=texto, font={"size":13, "color": "#000000"})
+        # Pie chart
+        fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.5, title=title_info)])
+        # Styling additions.
+        fig.update_traces(hoverinfo='label+percent', textinfo='value', textfont_size=15,
+                    marker=dict(colors=colors, line=dict(color='#FFFFFF', width=1)))
+        fig.update_layout(paper_bgcolor="rgba(221, 217, 217, 0.757)", width=GRAPH_WIDTH, height=GRAPH_HEIGHT, margin=dict(l=30,r=30,b=5,t=5), legend = dict(
+                    bgcolor = "rgba(221, 217, 217, 0)"), font=dict(color="black"))
+        return fig
+    except:
+        return empty_graph("Not matching data found.")
 
 def create_top5_graph(top5_df, year, noc):
     """ Creates a top 5 sports per country in a year graph. """
-    # We get the 5 best sports and medals for the country and year given using the dataframe.
-    values = top5_df.loc[(top5_df["Year"]==year) & (top5_df["NOC"]==noc)].iloc[:,2:].values[0].tolist()
-    colors = ["#80A3AE", "#9ACDDD", "#F29F9F", "#B6DB94", "#F9F4A6"]
-    # Inverse range from 5 to 1.
-    y = [i for i in range(5,0,-1)]
-    # Number of medals per sport.
-    x = [values[9], values[7], values[5], values[3], values[1]]
-    # Name of the sports.
-    deportes = [values[8], values[6], values[4], values[2], values[0]]
-    # Bar chart.
-    fig = go.Figure(data=[go.Bar(x=x, y=y, marker=dict(color=colors, line=dict(color='#FFFFFF', width=2)),orientation='h')])
-    # Styling additions.
-    fig.update_traces(text=deportes, hovertemplate="Position %{text}<br>%{x} medals")
-    fig.update_layout(paper_bgcolor='#DDD9D9', plot_bgcolor='rgba(0,0,0,0)', width=GRAPH_WIDTH, height=GRAPH_HEIGHT, 
-        xaxis = dict(side ="top"), margin=dict(l=5,r=10,b=5,t=5, pad=5))
-    return fig
+    try:
+        # We get the 5 best sports and medals for the country and year given using the dataframe.
+        values = top5_df.loc[(top5_df["Year"]==year) & (top5_df["NOC"]==noc)].iloc[:,2:].values[0].tolist()
+        colors = ["#80A3AE", "#9ACDDD", "#F29F9F", "#B6DB94", "#F9F4A6"]
+        # Inverse range from 5 to 1.
+        y = [i for i in range(5,0,-1)]
+        # Number of medals per sport.
+        x = [values[9], values[7], values[5], values[3], values[1]]
+        # Name of the sports.
+        deportes = [values[8], values[6], values[4], values[2], values[0]]
+        # Bar chart.
+        fig = go.Figure(data=[go.Bar(x=x, y=y, marker=dict(color=colors, line=dict(color='#FFFFFF', width=0)),orientation='h')])
+        # Styling additions.
+        fig.update_traces(text=deportes, textfont_color = "#000000", hovertemplate="Position %{text}<br>%{x} medals")
+        fig.update_layout(paper_bgcolor="rgba(221, 217, 217, 0.757)", plot_bgcolor='rgba(0,0,0,0)', width=GRAPH_WIDTH, height=GRAPH_HEIGHT, 
+            xaxis = dict(side ="top"), margin=dict(l=5,r=10,b=5,t=5, pad=5))
+        return fig
+    except:
+        return empty_graph("Not matching data found.")
+    
 
 def create_medals_country_graph(med_df, year, noc):
     """ Creates a medals per country in a year graph. """
     # Auxiliar information
     colors = ["#DFD082","#7D8398","#B98A67"]
     labels = ['Gold','Silver', 'Bronze']
-    # We get the number of gold, silver and bronze medals from the dataframe.
-    values = med_df.loc[(med_df["Year"]==year) & (med_df["NOC"]==noc)].iloc[:,-3:].values[0].tolist()
-    # Pie chart.
-    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.5)])
-    # Styling additions.
-    fig.update_traces(hoverinfo='label+percent', textinfo='value', textfont_size=15,
-                  marker=dict(colors=colors, line=dict(color='#FFFFFF', width=2)))
-    fig.update_layout(paper_bgcolor='#DDD9D9', width=GRAPH_WIDTH, height=GRAPH_HEIGHT, margin=dict(l=30,r=30,b=5,t=5))
-    return fig
+    try:
+        # We get the number of gold, silver and bronze medals from the dataframe.
+        values = med_df.loc[(med_df["Year"]==year) & (med_df["NOC"]==noc)].iloc[:,-3:].values[0].tolist()
+        if sum(values) == 0:
+            return empty_graph("No medals won.")
+        # Pie chart.
+        fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=0.5)])
+        # Styling additions.
+        fig.update_traces(hoverinfo='label+percent', textinfo='value', textfont_size=15,
+                    marker=dict(colors=colors, line=dict(color='#ffffff', width=1)))
+        fig.update_layout(paper_bgcolor="rgba(221, 217, 217, 0.757)", width=GRAPH_WIDTH, height=GRAPH_HEIGHT, margin=dict(l=30,r=30,b=5,t=5))
+        return fig
+    except:
+        return empty_graph("Not matching data found.")
 
 def create_pib_graph(pib_df, year, noc):
     """ Creates a PIB per country graph """
     # Gets all the values for a given country in the PIB dataframe.
-    values = pib_df.loc[(pib_df["NOC"]==noc)]
-    # Insert the different categories into arrays.
-    years = values["Year"].values
-    medals = values["Medals"].values
-    pibs = values["PIB"].values
-    # We need to remark the color of the year we are visualizing.
-    colors = ['#7D8398'] * len(years)
-    # If we don't have data for that year we cannot create the graph.
     try:
-        colors[list(years).index(year)] = "#01FFF4"
+        values = pib_df.loc[(pib_df["NOC"]==noc)]
+        # Insert the different categories into arrays.
+        years = values["Year"].values
+        medals = values["Medals"].values
+        pibs = values["PIB"].values
+        # We need to remark the color of the year we are visualizing.
+        colors = ['#7D8398'] * len(years)
+        # If we don't have data for that year we cannot create the graph.
+        try:
+            colors[list(years).index(year)] = "#62b7b3"
+        except:
+            return None
+        # We need two graphs, so we make a template.
+        fig = make_subplots(rows=1, cols=1,
+            specs=[[{"secondary_y": True}]])
+        # Bar chart.
+        fig.add_trace(go.Bar(x=years, y=medals, yaxis="y1", marker=dict(color=colors), name="medals", 
+            hovertemplate="Year: %{x}.<br>Medals: %{y}"), row=1, col=1, secondary_y=False)
+        # Line chart.
+        fig.add_trace(go.Scatter(x=years, y=pibs, yaxis="y2", mode="lines", marker=dict(color="#a80000"), name="pib", hovertemplate="Year: %{x}.<br>PIB: %{y}"), 
+            row=1, col=1, secondary_y=True)
+        # Styling additions.
+        fig.update_layout(paper_bgcolor="rgba(221, 217, 217, 0.757)", plot_bgcolor='rgba(0,0,0,0)', width=GRAPH_WIDTH, height=GRAPH_HEIGHT, 
+            margin=dict(l=30,r=30,b=5,t=5), legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01, bgcolor = "rgba(221, 217, 217, 1)"), font=dict(color="black"))
+        return fig
     except:
-        return None
-    # We need two graphs, so we make a template.
-    fig = make_subplots(rows=1, cols=1,
-        specs=[[{"secondary_y": True}]])
-    # Bar chart.
-    fig.add_trace(go.Bar(x=years, y=medals, yaxis="y1", marker=dict(color=colors), name="medals", 
-        hovertemplate="Year: %{x}.<br>Medals: %{y}"), row=1, col=1, secondary_y=False)
-    # Line chart.
-    fig.add_trace(go.Scatter(x=years, y=pibs, yaxis="y2", mode="lines", marker=dict(color="#FE0000"), name="pib", hovertemplate="Year: %{x}.<br>PIB: %{y}"), 
-        row=1, col=1, secondary_y=True)
-    # Styling additions.
-    fig.update_layout(paper_bgcolor='#DDD9D9', plot_bgcolor='rgba(0,0,0,0)', width=GRAPH_WIDTH, height=GRAPH_HEIGHT, 
-        margin=dict(l=30,r=30,b=5,t=5), legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01))
-    return fig
+        return empty_graph("Not matching data found.")

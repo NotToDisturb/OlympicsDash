@@ -2,7 +2,7 @@ import pandas as pd
 
 from dataset_generators.base_dataset import BaseDataset
 
-PIB_DATASET_NAME = "PIB/Medals per year"
+PIB_DATASET_NAME = "PIB/MEDALS PER YEAR"
 PIB_DATASET_PATH = r".\res\pib_dataset.csv"
 
 class PIBDataset:
