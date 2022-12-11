@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500&display=swap');
 body{
-    background-color: #06082B;
+    background-color: #1b1c32;
     color:white; 
     font-family: 'Lexend', sans-serif;
 }
@@ -11,6 +11,7 @@ body{
     top: 0.5%;
     display: block;
     padding-bottom: 20px;
+    background-color: #06082B;
 }
 #medals-graph.dash-graph{
     width: 100%;
@@ -76,6 +77,12 @@ h3 {
 #buttons{
     width: 60%;
     align-items: center;
+    display: inline-flex;
+    margin-bottom: 10px;
+}
+
+#pib-toggle{
+    margin-left: 10px;
 }
 
 Button{
