@@ -58,20 +58,52 @@ def empty_graph(msg):
 
 def build_medals_figures_continent(medals_df, medal_type):
     years = medals_df["Year"].unique()
+    continents = medals_df["Continent"].unique()
     fig_years = {}
+    colors = ["royalblue", "crimson", "lightseagreen", "orange", "black", "gray"]
+
+
     for year in years:
+        fig = go.Figure()
         df_medals_year = medals_df[medals_df["Year"] == year]
-        # Create scatter plot using:
-        # - Country code as locator
-        # - Continent as the color
-        # - Country as the hover text
-        # - Medal count as the size
-        # - "natural earth" as the map type
-        fig_year = px.scatter_geo(df_medals_year, locations="NOC", color="Continent",
-                         hover_name="Team", size=medal_type,
-                         projection="natural earth")
-        fig_years[year] = fig_year
+        for i, continent in enumerate(continents):
+            df_sub = df_medals_year.loc[(df_medals_year["Continent"] == continent)]
+            fig.add_trace(go.Scattergeo(
+                locations = df_sub['NOC'],
+                geo = "geo",
+                marker = dict(
+                    size=df_sub[medal_type]**1.4,
+                    color = colors[i],
+                    line_color='rgb(40,40,40)',
+                    line_width=0.5,
+                    sizemode = 'area'
+                ),
+                text=df_sub[medal_type],
+                legendgrouptitle = {"text": "Continent", "font": {"color": "#000000", "size": 16}},
+                name = continent,
+                hovertemplate="%{location}<br>%{text} medals",
+            ))
+        fig.update_layout(
+            geo = dict(
+                bgcolor="#1b1c32",
+                landcolor="rgba(221, 217, 217, 1)"
+            ),
+            paper_bgcolor = "#1b1c32",
+            legend = dict(
+                bgcolor = "rgba(221, 217, 217, 0.757)",
+                itemwidth=40,
+                itemsizing = 'constant',
+                font=dict(
+                    family="Lexend",
+                    color= "black",
+                    size=14
+                )
+            ),
+            margin={"r": 0, "t": 25, "l": 0, "b":25}
+        )
+        fig_years[year] = fig
     return fig_years
+
 
 def build_medals_figures_pib(medals_df, medal_type):
     medals_df["PIB"] = medals_df['PIB'].div(1e9).round(0)
@@ -103,27 +135,27 @@ def build_medals_figures_pib(medals_df, medal_type):
                 ),
                 text=df_sub[medal_type],
                 legendgrouptitle = {"text": "PIB in Billion USD", "font": {"color": "#000000", "size": 16}},
-                name = 'PIB: {0} - {1}'.format(lim[0],lim[1]),
-                hovertemplate="%{location}<br>%{text} medals"))
-            fig.update_layout(
-                geo = go.layout.Geo(
-                    bgcolor="#06082B",
-                    landcolor="rgba(221, 217, 217, 1)"
-                ),
-                paper_bgcolor = "#06082B",
-                legend = dict(
-                    bgcolor = "rgba(221, 217, 217, 0.757)",
-                    itemwidth=40,
-                    itemsizing = 'constant',
-                    font=dict(
-                        family="Lexend",
-                        color= "black",
-                        size=14
-                    )
-                ),
-                height = 1000,
-                margin={"r": 0, "t": 25, "l": 0, "b":25}
-            )
+                name = '{0} - {1}'.format(lim[0],lim[1]),
+                hovertemplate="%{location}<br>%{text} medals"
+            ))
+        fig.update_layout(
+            geo = go.layout.Geo(
+                bgcolor="#1b1c32",
+                landcolor="rgba(221, 217, 217, 1)"
+            ),
+            paper_bgcolor = "#1b1c32",
+            legend = dict(
+                bgcolor = "rgba(221, 217, 217, 0.757)",
+                itemwidth=40,
+                itemsizing = 'constant',
+                font=dict(
+                    family="Lexend",
+                    color= "black",
+                    size=14
+                )
+            ),
+            margin={"r": 0, "t": 25, "l": 0, "b":25}
+        )
         fig_years[year] = fig
     return fig_years
 

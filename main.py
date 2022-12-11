@@ -91,8 +91,10 @@ def main():
     app.title = "OlympicsDash"
     app.layout = html.Div(
         children=[
-            html.H1( id="title", children="OlympicsDash"),
-            html.Div(id="subtitle", children="The place to look for all things Olympics data."),
+            html.Div(id="title-sub-div", children=[
+                html.H1( id="title", children="OlympicsDash"),
+                html.Div(id="subtitle", children="The place to look for all things Olympics data.")
+            ]),
 
             # Selected country and year selected
             html.Div(
@@ -101,25 +103,23 @@ def main():
                 html.Div(id="graph-buttons",children = [
                     # Buttons to select medal map
                     html.Div(id="titles-buttons", children = [
+                        html.Div(id="title-div", children=[
+                            # Title
+                            html.H2(id="title-text", children=medal_maps["gold-medal"]["name"])
+                        ]),
                         html.Div(id= "buttons", children=[
                             html.Button(id="gold-medals-button", n_clicks_timestamp=0, children="GOLD"),
                             html.Button(id="silver-medals-button", n_clicks_timestamp=0, children="SILVER"),
                             html.Button(id="bronze-medals-button", n_clicks_timestamp=0, children="BRONZE"),
                             html.Button(id="all-medals-button", n_clicks_timestamp=0, children="TOTAL"),
                             dcc.Checklist(id="pib-toggle", options=["Show PIB"], value=["Show PIB"])
-                        ]),
-                        html.Div(id="title-div", children=[
-                            # Title
-                            html.H2(id="title-text", children=medal_maps["gold-medal"]["name"])
                         ])
-                        
                     ]),
                     
                     # Map and slider
-                    
                     dcc.Graph(
                         id='medals-graph',
-                        figure=medal_maps["gold-medal"]["figures"][2016]
+                        figure=medal_maps["pib-gold-medal"]["figures"][2016]
                     ),
                     build_year_slider(medals_df)
                 ]),
