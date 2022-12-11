@@ -9,11 +9,12 @@ from dash import dcc
 GRAPH_HEIGHT = 200
 GRAPH_WIDTH = 300
 
+
 # Get the yearly sum of medals of a type
-def get_medal_dataframe(df, medal_type):
-    group_keys = ["Year", "NOC", "Team", "Continent", "PIB"]
-    df_medal = df[group_keys + [medal_type]].groupby(group_keys).sum().reset_index()
-    return df_medal
+def get_medal_dataframe(df, medal_type, group_type):
+    group_keys = ["Year", "NOC", "Team", group_type]
+    medal_df = df[group_keys + [medal_type]].groupby(group_keys).sum().reset_index()
+    return medal_df
 
 
 # Build a slider object to select which year to display in the dashboard map
@@ -55,13 +56,29 @@ def empty_graph(msg):
         }
     }
 
-# Build the dictionary of yearly medals for a medal type
-def build_medals_figures(medals_df, medal_type):
+def build_medals_figures_continent(medals_df, medal_type):
+    years = medals_df["Year"].unique()
+    fig_years = {}
+    for year in years:
+        df_medals_year = medals_df[medals_df["Year"] == year]
+        # Create scatter plot using:
+        # - Country code as locator
+        # - Continent as the color
+        # - Country as the hover text
+        # - Medal count as the size
+        # - "natural earth" as the map type
+        fig_year = px.scatter_geo(df_medals_year, locations="NOC", color="Continent",
+                         hover_name="Team", size=medal_type,
+                         projection="natural earth")
+        fig_years[year] = fig_year
+    return fig_years
+
+def build_medals_figures_pib(medals_df, medal_type):
     medals_df["PIB"] = medals_df['PIB'].div(1e9).round(0)
     medals_df = medals_df[["Year", "NOC", "Team", medal_type, "PIB"]].groupby(["Year", "NOC", "Team", "PIB"]).sum().reset_index()
     years = medals_df["Year"].unique()
     fig_years = {}
-    colors = ["royalblue","crimson","lightseagreen","orange"]
+    colors = ["royalblue", "crimson", "lightseagreen", "orange"]
     q3,q2,q1 = np.percentile(medals_df['PIB'].unique(), [75, 50, 25])
 
     limits = [(0,q1),(q1,q2),(q2,q3),(q3,max(medals_df["PIB"]))]
@@ -109,6 +126,13 @@ def build_medals_figures(medals_df, medal_type):
         fig_years[year] = fig
     return fig_years
 
+group_types = {
+    "Continent": build_medals_figures_continent,
+    "PIB": build_medals_figures_pib
+}
+# Build the dictionary of yearly medals for a medal type
+def build_medals_figures(medals_df, medal_type, group_type):
+    return group_types[group_type](medals_df, medal_type)
 
 # Creates the genre graphs and returns it
 def create_genre_graph(gender_df, year, noc):

@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 from dataset_generators.base_dataset import BaseDataset
 
@@ -22,8 +23,9 @@ class PIBDataset:
         df["Bronze"] = df["Medal"].apply(lambda row: 1 if row == "Bronze" else 0)   # Won a bronze medal
         df["Medals"] = df["Gold"] + df["Silver"] + df["Bronze"]                     # Won any medal
         pib_df = df[["Year", "NOC", "Team", "Continent", "Sport", "Medals", "PIB"]]
-        group_keys = ["Year", "NOC", "Medals", "PIB"]
-        pib_df = df[group_keys].groupby(group_keys[:2]).sum().reset_index()
+        group_keys = ["Year", "NOC","Continent", "Medals", "PIB"]
+        pib_df = df[group_keys].groupby(group_keys[:3]).sum().reset_index()
+        pib_df["PIB/MEDALS"] = pib_df['PIB'].div(pib_df['Medals']).replace(np.inf, 0)
         pib_df.to_csv(PIB_DATASET_PATH, index=False)
        
     

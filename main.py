@@ -31,32 +31,57 @@ medal_maps = {
     "gold-medal": {
         "name": "GOLD",
         "type": "Gold",
-        "data": get_medal_dataframe(medals_df, "Gold"),
+        "group": "Continent",
         "figures": None
     },
     "silver-medal": {
         "name": "SILVER",
         "type": "Silver",
-        "data": get_medal_dataframe(medals_df, "Silver"),
+        "group": "Continent",
         "figures": None
     },
     "bronze-medal": {
         "name": "BRONZE",
         "type": "Bronze",
-        "data": get_medal_dataframe(medals_df, "Bronze"),
+        "group": "Continent",
         "figures": None
     },
     "all-medals": {
         "name": "TOTAL",
         "type": "Medals",
-        "data": get_medal_dataframe(medals_df, "Medals"),
+        "group": "Continent",
+        "figures": None
+    },
+    "pib-gold-medal": {
+        "name": "PIB/GOLDS",
+        "type": "Gold",
+        "group": "PIB",
+        "figures": None
+    },
+    "pib-silver-medal": {
+        "name": "PIB/SILVERS",
+        "type": "Silver",
+        "group": "PIB",
+        "figures": None
+    },
+    "pib-bronze-medal": {
+        "name": "PIB/BRONZE",
+        "type": "Bronze",
+        "group": "PIB",
+        "figures": None
+    },
+    "pib-all-medals": {
+        "name": "PIB/MEDALS",
+        "type": "Medals",
+        "group": "PIB",
         "figures": None
     }
 }
 # Init medal figures
 def init_figures():
     for medal_map in medal_maps.values():
-        medal_map["figures"] = build_medals_figures(medal_map["data"], medal_map["type"])
+        medal_data = get_medal_dataframe(medals_df, medal_map["type"], medal_map["group"])
+        medal_map["figures"] = build_medals_figures(medal_data, medal_map["type"], medal_map["group"])
 
 
 def main():
@@ -80,7 +105,8 @@ def main():
                             html.Button(id="gold-medals-button", n_clicks_timestamp=0, children="GOLD"),
                             html.Button(id="silver-medals-button", n_clicks_timestamp=0, children="SILVER"),
                             html.Button(id="bronze-medals-button", n_clicks_timestamp=0, children="BRONZE"),
-                            html.Button(id="all-medals-button", n_clicks_timestamp=0, children="TOTAL")    
+                            html.Button(id="all-medals-button", n_clicks_timestamp=0, children="TOTAL"),
+                            dcc.Checklist(id="pib-toggle", options=["Show PIB"], value=["Show PIB"])
                         ]),
                         html.Div(id="title-div", children=[
                             # Title
@@ -189,9 +215,10 @@ button_to_map = {
     Input('gold-medals-button', 'disabled'),
     Input('silver-medals-button', 'disabled'),
     Input('bronze-medals-button', 'disabled'),
-    Input('all-medals-button', 'disabled')
+    Input('all-medals-button', 'disabled'),
+    Input('pib-toggle', 'value')
 )
-def update_graph(select_year, gold_disabled, silver_disabled, bronze_disabled, all_disabled):
+def update_graph(select_year, gold_disabled, silver_disabled, bronze_disabled, all_disabled, pib_toggle):
     # Map button states to button ids
     disabled_buttons = {
         "gold-medal-button": gold_disabled,
@@ -203,7 +230,8 @@ def update_graph(select_year, gold_disabled, silver_disabled, bronze_disabled, a
     disabled_map = None
     for button, disabled in disabled_buttons.items():
         if disabled:
-            disabled_map = medal_maps[button_to_map[button]]
+            map_name = ("pib-" if len(pib_toggle) > 0 else "") + button_to_map[button]
+            disabled_map = medal_maps[map_name]
             break
     
     # Return medal name and selected yearly map
