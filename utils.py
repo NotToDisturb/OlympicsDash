@@ -92,18 +92,19 @@ def build_medals_figures_pib(medals_df, medal_type):
             df_sub = df_medals_year.loc[(df_medals_year["PIB"]>=lim[0]) & (df_medals_year["PIB"]<=lim[1])]
             # print(df_sub)
             fig.add_trace(go.Scattergeo(
-            locations = df_sub['NOC'],
-            #text = df_sub['text'],
-            geo = "geo",
-            marker = dict(
-                size=df_sub[medal_type]**1.4,
-                color = colors[i],
-                line_color='rgb(40,40,40)',
-                line_width=0.5,
-                sizemode = 'area'
-            ),
-            legendgrouptitle = {"text": "PIB in Billion USD", "font": {"color": "#000000", "size": 16}},
-            name = '{0} - {1}'.format(lim[0],lim[1])))
+                locations = df_sub['NOC'],
+                geo = "geo",
+                marker = dict(
+                    size=df_sub[medal_type]**1.4,
+                    color = colors[i],
+                    line_color='rgb(40,40,40)',
+                    line_width=0.5,
+                    sizemode = 'area'
+                ),
+                text=df_sub[medal_type],
+                legendgrouptitle = {"text": "PIB in Billion USD", "font": {"color": "#000000", "size": 16}},
+                name = 'PIB: {0} - {1}'.format(lim[0],lim[1]),
+                hovertemplate="%{location}<br>%{text} medals"))
             fig.update_layout(
                 geo = go.layout.Geo(
                     bgcolor="#06082B",
