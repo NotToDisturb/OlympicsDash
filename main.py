@@ -29,49 +29,49 @@ pib_df = PIBDataset.load_data()
 # - figures: yearly representations of the medal data (set in init_figures())
 medal_maps = {
     "gold-medal": {
-        "name": "GOLD",
+        "name": "GOLD MEDALS",
         "type": "Gold",
         "group": "Continent",
         "figures": None
     },
     "silver-medal": {
-        "name": "SILVER",
+        "name": "SILVER MEDALS",
         "type": "Silver",
         "group": "Continent",
         "figures": None
     },
     "bronze-medal": {
-        "name": "BRONZE",
+        "name": "BRONZE MEDALS",
         "type": "Bronze",
         "group": "Continent",
         "figures": None
     },
     "all-medals": {
-        "name": "TOTAL",
+        "name": "TOTAL MEDALS",
         "type": "Medals",
         "group": "Continent",
         "figures": None
     },
     "pib-gold-medal": {
-        "name": "PIB/GOLDS",
+        "name": "GOLD MEDALS + PIB DATA",
         "type": "Gold",
         "group": "PIB",
         "figures": None
     },
     "pib-silver-medal": {
-        "name": "PIB/SILVERS",
+        "name": "SILVER MEDALS + PIB DATA",
         "type": "Silver",
         "group": "PIB",
         "figures": None
     },
     "pib-bronze-medal": {
-        "name": "PIB/BRONZE",
+        "name": "BRONZE MEDALS + PIB DATA",
         "type": "Bronze",
         "group": "PIB",
         "figures": None
     },
     "pib-all-medals": {
-        "name": "PIB/MEDALS",
+        "name": "MEDALS MEDALS + PIB DATA",
         "type": "Medals",
         "group": "PIB",
         "figures": None

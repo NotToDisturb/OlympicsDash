@@ -60,7 +60,7 @@ def build_medals_figures_continent(medals_df, medal_type):
     years = medals_df["Year"].unique()
     continents = medals_df["Continent"].unique()
     fig_years = {}
-    colors = ["royalblue", "crimson", "lightseagreen", "orange", "black", "gray"]
+    colors = ["red", "orange", "yellow", "green", "blue", "purple"]
 
 
     for year in years:
@@ -85,10 +85,10 @@ def build_medals_figures_continent(medals_df, medal_type):
             ))
         fig.update_layout(
             geo = dict(
-                bgcolor="#1b1c32",
+                bgcolor="#292929",
                 landcolor="rgba(221, 217, 217, 1)"
             ),
-            paper_bgcolor = "#1b1c32",
+            paper_bgcolor = "#292929",
             legend = dict(
                 bgcolor = "rgba(221, 217, 217, 0.757)",
                 itemwidth=40,
@@ -110,7 +110,7 @@ def build_medals_figures_pib(medals_df, medal_type):
     medals_df = medals_df[["Year", "NOC", "Team", medal_type, "PIB"]].groupby(["Year", "NOC", "Team", "PIB"]).sum().reset_index()
     years = medals_df["Year"].unique()
     fig_years = {}
-    colors = ["royalblue", "crimson", "lightseagreen", "orange"]
+    colors = ["yellow","green", "blue", "purple"]
     q3,q2,q1 = np.percentile(medals_df['PIB'].unique(), [75, 50, 25])
 
     limits = [(0,q1),(q1,q2),(q2,q3),(q3,max(medals_df["PIB"]))]
@@ -140,10 +140,10 @@ def build_medals_figures_pib(medals_df, medal_type):
             ))
         fig.update_layout(
             geo = go.layout.Geo(
-                bgcolor="#1b1c32",
+                bgcolor="#292929",
                 landcolor="rgba(221, 217, 217, 1)"
             ),
-            paper_bgcolor = "#1b1c32",
+            paper_bgcolor = "#292929",
             legend = dict(
                 bgcolor = "rgba(221, 217, 217, 0.757)",
                 itemwidth=40,

@@ -1,7 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500&display=swap');
+
+:root {
+    --main-bg-color: #292929;
+    --main-color: #898dff;
+    --title-bg-color: #1b1c32;
+    --title-color: white;
+    --sidebar-bg-color: #1F1B24;
+    --sidebar-color: white;
+    --button-color: #585ba4;
+    --button-hover-color: #2e3057;
+    --button-disabled-color: #2e3057;
+}
+
 body{
-    background-color: #1b1c32;
-    color:white; 
+    background-color: var(--main-bg-color);
+    color: var(--main-color); 
     font-family: 'Lexend', sans-serif;
     padding: 0;
     margin: 0;
@@ -15,7 +28,8 @@ body{
     top: 0;
     display: block;
     padding-bottom: 20px;
-    background-color: #06082B;
+    color: var(--sidebar-color);
+    background-color: var(--sidebar-bg-color);
 }
 #medals-graph.dash-graph{
     width: 100%;
@@ -26,7 +40,7 @@ body{
 .cd_class{
     display: flex;
     flex-wrap: wrap;
-    background-color: #06082B;
+    background-color: var(--sidebar-bg-color);
     margin: 10px auto;
     width: 100%;
     padding: 10px;
@@ -55,6 +69,9 @@ h3 {
     width: 50%;
     margin: auto;
     text-align: center;
+    font-weight: bold;
+    font-size: 22px;
+    color: var(--main-color);
 }
 
 .grafico{
@@ -94,21 +111,30 @@ h3 {
 }
 
 Button{
-    margin-right: 5px;
+    padding: 10px;
+    border: 0px outset;
+    height: 35px;
     font-weight: bold;
+    background-color: var(--button-color);
+    color: var(--title-color);
     cursor: pointer;
 }
 
 Button:hover{
-    opacity: 0.8;
+    background-color: var(--button-hover-color);
+}
+
+button[disabled]{
+    background-color: var(--button-disabled-color);
 }
 
 input[type="checkbox"]{
     cursor: pointer;
+    accent-color: var(--main-color);
 }
 
 #title-sub-div{
-    background-color: rgba(250, 235, 215, 0.646);
+    background-color: var(--title-bg-color);
     position:fixed;
     width: 77%;
     left: -1;
@@ -118,7 +144,7 @@ input[type="checkbox"]{
 #title{
     margin-left: 40px;
     margin-top: 30px;
-    color: #06082B;
+    color: var(--title-color);
 }
 
 #title-div{
@@ -129,7 +155,7 @@ input[type="checkbox"]{
     font-style: italic;
     margin-left: 40px;
     margin-bottom: 20px;
-    color: #06082B;
+    color: var(--title-color);
 }
 
 
