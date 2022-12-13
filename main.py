@@ -71,7 +71,7 @@ medal_maps = {
         "figures": None
     },
     "pib-all-medals": {
-        "name": "MEDALS MEDALS + PIB DATA",
+        "name": "TOTAL MEDALS + PIB DATA",
         "type": "Medals",
         "group": "PIB",
         "figures": None
@@ -105,7 +105,7 @@ def main():
                     html.Div(id="titles-buttons", children = [
                         html.Div(id="title-div", children=[
                             # Title
-                            html.H2(id="title-text", children=medal_maps["gold-medal"]["name"])
+                            html.H2(id="title-text", children=medal_maps["pib-gold-medal"]["name"])
                         ]),
                         html.Div(id= "buttons", children=[
                             html.Button(id="gold-medals-button", n_clicks_timestamp=0, children="GOLD"),
